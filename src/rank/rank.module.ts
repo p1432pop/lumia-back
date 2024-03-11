@@ -6,10 +6,12 @@ import { Ranking2 } from './season2.entity';
 import { RankRepository } from './rank.repository';
 import { AxiosModule } from 'src/axios/axios.module';
 import { AxiosService } from 'src/axios/axios.service';
+import { Game } from 'src/rank/game.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Ranking2]), AxiosModule],
+  imports: [TypeOrmModule.forFeature([Ranking2, Game]), AxiosModule],
   controllers: [RankController],
-  providers: [RankService, RankRepository, AxiosService],
+  providers: [RankService, RankRepository],
+  exports: [RankService],
 })
 export class RankModule {}

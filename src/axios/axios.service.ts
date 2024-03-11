@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import axios from 'axios';
+import { Game } from 'src/rank/game.entity';
 import { Ranking2 } from 'src/rank/season2.entity';
 
 @Injectable()
@@ -37,8 +38,54 @@ export class AxiosService {
     let results = [];
     let res = await Promise.all(URIs.map((endpoint: string) => axios.get(endpoint, this.option)));
     res.forEach((item) => {
-      let data = item.data;
-      results.push(data);
+      if (item.data.code === 200 && item.data.userGames[0].seasonId > 0) {
+        item.data.userGames.forEach((user) => {
+          let game = new Game();
+          game.userNum = user.userNum;
+          game.gameId = user.gameId;
+          game.versionMajor = user.versionMajor;
+          game.versionMinor = user.versionMinor;
+          game.characterNum = user.characterNum;
+          game.characterLevel = user.characterLevel;
+          game.gameRank = user.gameRank;
+          game.playerKill = user.playerKill;
+          game.playerAssistant = user.playerAssistant;
+          game.monsterKill = user.monsterKill;
+          game.bestWeapon = user.bestWeapon;
+          game.bestWeaponLevel = user.bestWeaponLevel;
+          game.masteryLevel = JSON.stringify(user.masteryLevel);
+          game.equipment = JSON.stringify(user.equipment);
+          game.startDtm = user.startDtm;
+          game.duration = user.duration;
+          game.mmrBefore = user.mmrBefore;
+          game.mmrAfter = user.mmrAfter;
+          game.mmrGain = user.mmrGain;
+          game.victory = user.victory;
+          game.damageFromMonster = user.damageFromMonster;
+          game.damageFromPlayer = user.damageFromPlayer;
+          game.damageToMonster = user.damageToMonster;
+          game.damageToPlayer = user.damageToPlayer;
+          game.killMonsters = JSON.stringify(user.killMonsters);
+          game.healAmount = user.healAmount;
+          game.teamRecover = user.teamRecover;
+          game.addSurveillanceCamera = user.addSurveillanceCamera;
+          game.addTelephotoCamera = user.addTelephotoCamera;
+          game.removeSurveillanceCamera = user.removeSurveillanceCamera;
+          game.removeTelephotoCamera = user.removeTelephotoCamera;
+          game.giveUp = user.giveUp;
+          game.matchSize = user.matchSize;
+          game.teamKill = user.teamKill;
+          game.accountLevel = user.accountLevel;
+          game.traitFirstCore = user.traitFirstCore;
+          game.traitFirstSub = JSON.stringify(user.traitFirstSub);
+          game.traitSecondSub = JSON.stringify(user.traitSecondSub);
+          game.escapeState = user.escapeState;
+          game.tacticalSkillGroup = user.tacticalSkillGroup;
+          game.tacticalSkillLevel = user.tacticalSkillLevel;
+          game.totalGainVFCredit = user.totalGainVFCredit;
+          results.push(game);
+        });
+      }
     });
     return results;
   }

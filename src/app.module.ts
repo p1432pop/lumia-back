@@ -36,9 +36,8 @@ import { AxiosService } from './axios/axios.service';
     }),
     RankModule,
     BatchModule,
-    AxiosModule,
   ],
   controllers: [AppController],
-  providers: [AppService, AxiosService],
+  providers: [AppService],
 })
 export class AppModule {}

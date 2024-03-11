@@ -19,7 +19,7 @@ export class RankService {
     return this.axiosService.getGameByGameId(gameId);
   }
   getGamesByGameIds(gameIds: number[]): Promise<any> {
-    return this.axiosService.getGamesByGameIds(gameIds);
+    return this.rankRepository.insertGames(this.axiosService.getGamesByGameIds(gameIds));
   }
   updateRanking() {
     const result = this.axiosService.getSeasonRanking(21);

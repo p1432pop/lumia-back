@@ -3,5 +3,6 @@ import { AxiosService } from './axios.service';
 
 @Module({
   providers: [AxiosService],
+  exports: [AxiosService],
 })
 export class AxiosModule {}

@@ -1,4 +1,4 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Param, ParseIntPipe } from '@nestjs/common';
 import { RankService } from './rank.service';
 import { Ranking2 } from './season2.entity';
 
@@ -7,16 +7,17 @@ export class RankController {
   constructor(private readonly rankService: RankService) {}
 
   @Get('/:gameId')
-  getRank(@Param('gameId') gameId: number): Promise<number> {
-    let arr = [gameId];
-    for (let i = 1; i < 10; i++) {
+  getRank(@Param('gameId', ParseIntPipe) gameId: number): Promise<number> {
+    let arr = [];
+    for (let i: number = 0; i < 40; i++) {
       arr.push(gameId + i);
+      console.log(gameId + i);
     }
     return this.rankService.getGamesByGameIds(arr);
   }
 
   @Get()
   geta() {
-    return this.rankService.updateRanking();
+    return this.rankService.getRank();
   }
 }

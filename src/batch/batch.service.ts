@@ -5,9 +5,15 @@ import { RankService } from 'src/rank/rank.service';
 
 @Injectable()
 export class BatchService {
-  constructor(private readonly configService: ConfigService) {}
-  @Cron('0 * * * *')
+  private gameId: number;
+  constructor(
+    private readonly configService: ConfigService,
+    private readonly rankService: RankService,
+  ) {
+    this.gameId = parseInt(this.configService.get<string>('FIRST_GAME_ID'));
+  }
+  @Cron('*/2 * * * * *')
   updateRanking() {
-    const BSER_API_KEY = this.configService.get<string>('BSER_API_KEY');
+    console.log(1);
   }
 }
