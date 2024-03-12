@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import axios from 'axios';
 import { Game } from 'src/rank/game.entity';
-import { Ranking2 } from 'src/rank/season2.entity';
+import { Ranking } from 'src/rank/ranking.entity';
 
 @Injectable()
 export class AxiosService {
@@ -22,13 +22,11 @@ export class AxiosService {
     return result.data.userStats[0];
   }
   async getSeasonRanking(season: number) {
-    try {
-      const result = await axios.get(`https://open-api.bser.io/v1/rank/top/${season}/3`, this.option);
-      return this.getUserStatsByUserNums(
-        result.data.topRanks.map((user: { userNum: number }) => user.userNum),
-        season,
-      );
-    } catch (err) {}
+    const result = await axios.get(`https://open-api.bser.io/v1/rank/top/${season}/3`, this.option);
+    return this.getUserStatsByUserNums(
+      result.data.topRanks.map((user: { userNum: number }) => user.userNum),
+      season,
+    );
   }
   async getGamesByGameIds(gameIds: number[]) {
     let URIs: string[] = [];
@@ -105,8 +103,9 @@ export class AxiosService {
       let res = await Promise.all(targetURIs.map((endpoint: string) => axios.get(endpoint, this.option)));
       res.forEach((item) => {
         let data = item.data.userStats[0];
-        const player = new Ranking2();
+        const player = new Ranking();
         player.userNum = data.userNum;
+        player.seasonId = data.seasonId;
         player.nickname = data.nickname;
         player.rank = data.rank;
         player.mmr = data.mmr;
@@ -118,13 +117,13 @@ export class AxiosService {
         data.characterStats.forEach((item, idx) => {
           if (idx === 0) {
             player.characterCode1 = item.characterCode;
-            player.char1total = item.totalGames;
+            player.charTotal1 = item.totalGames;
           } else if (idx === 1) {
             player.characterCode2 = item.characterCode;
-            player.char2total = item.totalGames;
+            player.charTotal2 = item.totalGames;
           } else if (idx === 2) {
             player.characterCode3 = item.characterCode;
-            player.char3total = item.totalGames;
+            player.charTotal3 = item.totalGames;
           }
         });
         results.push(player);

@@ -1,9 +1,12 @@
 import { BaseEntity, Column, Entity, PrimaryColumn } from 'typeorm';
 
-@Entity('Ranking2')
-export class Ranking2 extends BaseEntity {
+@Entity('Ranking')
+export class Ranking extends BaseEntity {
   @PrimaryColumn()
   userNum: number;
+
+  @PrimaryColumn()
+  seasonId: number;
 
   @Column()
   nickname: string;
@@ -41,7 +44,7 @@ export class Ranking2 extends BaseEntity {
   characterCode1: number;
 
   @Column()
-  char1total: number;
+  charTotal1: number;
 
   @Column({
     nullable: true,
@@ -53,7 +56,7 @@ export class Ranking2 extends BaseEntity {
     nullable: true,
     default: null,
   })
-  char2total: number;
+  charTotal2: number;
 
   @Column({
     nullable: true,
@@ -65,5 +68,5 @@ export class Ranking2 extends BaseEntity {
     nullable: true,
     default: null,
   })
-  char3total: number;
+  charTotal3: number;
 }

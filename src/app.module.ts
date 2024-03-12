@@ -1,14 +1,10 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { AppService } from './app.service';
-import { AppController } from './app.controller';
 import { RankModule } from './rank/rank.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { BatchModule } from './batch/batch.module';
-import { AxiosModule } from './axios/axios.module';
-import { AxiosService } from './axios/axios.service';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -31,13 +27,11 @@ import { AxiosService } from './axios/axios.service';
         };
       },
     }),
-    ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '../build'),
-    }),
+    /* ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '../../build'),
+    }), */
     RankModule,
     BatchModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
 })
 export class AppModule {}

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { RankRepository } from './rank.repository';
-import { Ranking2 } from './season2.entity';
+import { Ranking } from './ranking.entity';
 import { AxiosService } from 'src/axios/axios.service';
 
 @Injectable()
@@ -9,10 +9,10 @@ export class RankService {
     private readonly rankRepository: RankRepository,
     private readonly axiosService: AxiosService,
   ) {}
-  getRank(): Promise<any> {
-    return this.rankRepository.getRank();
+  getRanking(seasonId: number): Promise<Ranking[]> {
+    return this.rankRepository.getRanking(seasonId);
   }
-  getUserNumByNickname(nickname: string): Promise<number> {
+  /*   getUserNumByNickname(nickname: string): Promise<number> {
     return this.axiosService.getUserNumByNickname(nickname);
   }
   getGameByGameId(gameId: number): Promise<any> {
@@ -20,9 +20,12 @@ export class RankService {
   }
   getGamesByGameIds(gameIds: number[]): Promise<any> {
     return this.rankRepository.insertGames(this.axiosService.getGamesByGameIds(gameIds));
-  }
-  updateRanking() {
+  } */
+  async updateRanking() {
+    console.log(1);
     const result = this.axiosService.getSeasonRanking(21);
-    return this.rankRepository.updateRanking(result);
+    console.log(2);
+    this.rankRepository.updateRanking(result);
+    console.log(3);
   }
 }

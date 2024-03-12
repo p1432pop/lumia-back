@@ -12,7 +12,7 @@ export class BatchService {
   ) {
     this.gameId = parseInt(this.configService.get<string>('FIRST_GAME_ID'));
   }
-  @Cron('*/2 * * * * *')
+  @Cron('*/2 * * * 1 *')
   updateRanking() {
     console.log(1);
   }
