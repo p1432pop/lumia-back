@@ -1,7 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import axios from 'axios';
-import { Game } from 'src/rank/game.entity';
+import { Game } from 'src/game/game.entity';
 import { Ranking } from 'src/rank/ranking.entity';
 
 @Injectable()
@@ -87,7 +87,7 @@ export class AxiosService {
     });
     return results;
   }
-  async getUserStatsByUserNums(userNums: number[], season: number) {
+  async getUserStatsByUserNums(userNums: number[], season: number): Promise<Ranking[]> {
     let URIs: string[] = [];
     userNums.forEach((userNum: number) => {
       URIs.push(`https://open-api.bser.io/v1/user/stats/${userNum}/${season}`);
@@ -152,7 +152,11 @@ export class AxiosService {
   }
   async getUserNumByNickname(nickname: string): Promise<number> {
     const result = await axios.get(`https://open-api.bser.io/v1/user/nickname?query=${nickname}`, this.option);
-    return result.data.user.userNum;
+    if (result.data.code === 404) {
+      throw new NotFoundException();
+    } else if (result.data.code === 200) {
+      return result.data.user.userNum;
+    }
   }
 
   async getRankByUserNum(userNum: number, season: number): Promise<number> {

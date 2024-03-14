@@ -5,6 +5,8 @@ import { RankModule } from './rank/rank.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { BatchModule } from './batch/batch.module';
+import { PlayerModule } from './player/player.module';
+import { GameModule } from './game/game.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -24,6 +26,7 @@ import { BatchModule } from './batch/batch.module';
           password: configService.get<string>('DB_PASSWORD'),
           entities: [__dirname + '/**/*.entity{.ts,.js}'],
           synchronize: configService.get<boolean>('SYNC'),
+          logging: true,
         };
       },
     }),
@@ -32,6 +35,8 @@ import { BatchModule } from './batch/batch.module';
     }), */
     RankModule,
     BatchModule,
+    PlayerModule,
+    GameModule,
   ],
 })
 export class AppModule {}
