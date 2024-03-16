@@ -17,13 +17,9 @@ export class AxiosService {
       },
     };
   }
-  async test() {
-    const result = await axios.get(`https://open-api.bser.io/v1/user/stats/2250281/21`, this.option);
-    return result.data.userStats[0];
-  }
   async getSeasonRanking(season: number) {
     const result = await axios.get(`https://open-api.bser.io/v1/rank/top/${season}/3`, this.option);
-    return this.getUserStatsByUserNums(
+    return await this.getUserStatsByUserNums(
       result.data.topRanks.map((user: { userNum: number }) => user.userNum),
       season,
     );
@@ -164,7 +160,7 @@ export class AxiosService {
     return result.data.userRank.rank;
   }
 
-  async getGamesByUserNum(userNum: number, next?: number): Promise<{ userGames: Array<any>; next: number }> {
+  async getGamesByUserNum(userNum: number, next?: number): Promise<{ userGames: Array<Object>; next: number }> {
     let url = `https://open-api.bser.io/v1/user/games/${userNum}`;
     if (next) {
       url += `?next=${next}`;

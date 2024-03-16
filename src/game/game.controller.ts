@@ -5,8 +5,8 @@ import { GameService } from './game.service';
 export class GameController {
   constructor(private readonly gameService: GameService) {}
 
-  @Get('/:userNum')
-  get(@Param('userNum', ParseIntPipe) userNum: number) {
-    return this.gameService.get(userNum);
+  @Get('/:gameId')
+  get(@Param('gameId', ParseIntPipe) gameId: number) {
+    return this.gameService.get(gameId);
   }
 }

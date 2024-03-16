@@ -18,8 +18,7 @@ export class RankRepository {
     });
   }
 
-  async updateRanking(users: Promise<Ranking[]>) {
-    const user = await users;
-    await this.rankRepository.createQueryBuilder().insert().into(Ranking).values(user).execute();
+  async updateRanking(users: Ranking[]) {
+    await this.rankRepository.createQueryBuilder().insert().into(Ranking).values(users).execute();
   }
 }

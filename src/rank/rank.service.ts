@@ -21,11 +21,11 @@ export class RankService {
   getGamesByGameIds(gameIds: number[]): Promise<any> {
     return this.rankRepository.insertGames(this.axiosService.getGamesByGameIds(gameIds));
   } */
-  async updateRanking() {
+  async updateRanking(seasonId: number) {
     console.log(1);
-    const result = this.axiosService.getSeasonRanking(21);
+    const result = await this.axiosService.getSeasonRanking(seasonId);
     console.log(2);
-    this.rankRepository.updateRanking(result);
+    await this.rankRepository.updateRanking(result);
     console.log(3);
   }
 }

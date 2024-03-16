@@ -10,25 +10,30 @@ export class PlayerService {
     private readonly playerRepository: PlayerRepository,
     private readonly gameService: GameService,
   ) {}
-  async get(nickname: string) {
+  async get(nickname: string, season: number) {
     const userNum = await this.axiosService.getUserNumByNickname(nickname);
-    console.log(userNum);
     const result = await this.playerRepository.getPlayerByUserNum(userNum);
-    const result2 = await this.gameService.get(userNum);
-    return result2;
+    const games = await this.gameService.get(userNum);
+    const rank = await this.axiosService.getRankByUserNum(userNum, season);
     if (result) {
       //DB에 있는 플레이어
       const updated = new Date(result.updated);
       const now = new Date();
       if (now.getTime() - updated.getTime() < 5 * 60 * 1000) {
-        // 최근 갱신한 경우
+        return {
+          view: 1,
+          userNum,
+          games,
+          updated,
+          rank,
+        };
       } else {
-        // 갱신 가능
         return {
           view: 2,
           userNum,
           games: 1,
           updated: 1,
+          rank,
         };
       }
     } else {
@@ -37,10 +42,10 @@ export class PlayerService {
         view: 3,
         userNum,
         games: [],
-        updated: undefined,
+        updated: null,
+        rank: undefined,
       };
     }
-    return userNum;
   }
   async get2() {
     const dto = await this.playerRepository.getPlayerByUserNum(123);

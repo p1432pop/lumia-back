@@ -4,9 +4,10 @@ import { GameService } from './game.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Game } from './game.entity';
 import { GameRepository } from './game.repository';
+import { AxiosModule } from 'src/axios/axios.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Game])],
+  imports: [TypeOrmModule.forFeature([Game]), AxiosModule],
   controllers: [GameController],
   providers: [GameService, GameRepository],
   exports: [GameService],
