@@ -9,7 +9,10 @@ export class GameRepository {
     @InjectRepository(Game)
     private readonly gameRepository: Repository<Game>,
   ) {}
-  get(userNum: number) {
-    return this.gameRepository.find({ where: { userNum }, take: 20 });
+  async get(userNum: number) {
+    return await this.gameRepository.find({ order: { gameId: 'DESC' }, where: { userNum }, take: 30 });
+  }
+  async insertGames(games: Game[]): Promise<void> {
+    await this.gameRepository.insert(games);
   }
 }

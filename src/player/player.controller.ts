@@ -1,5 +1,6 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseIntPipe, Post, UsePipes, ValidationPipe } from '@nestjs/common';
 import { PlayerService } from './player.service';
+import { UpdatePlayerDto } from './dto/update-player.dto';
 
 @Controller('player')
 export class PlayerController {
@@ -10,7 +11,8 @@ export class PlayerController {
     return await this.playerService.get(nickname, season);
   }
   @Post()
-  updatePlayer(@Body('nickname') nickname: string, @Body('userNum', ParseIntPipe) userNum: number, @Body('updated') updated: Date) {
-    return { nickname };
+  @UsePipes(ValidationPipe)
+  async updatePlayer(@Body() updatePlayerDto: UpdatePlayerDto) {
+    return await this.playerService.post(updatePlayerDto);
   }
 }

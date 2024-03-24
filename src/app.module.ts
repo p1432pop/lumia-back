@@ -26,13 +26,13 @@ import { GameModule } from './game/game.module';
           password: configService.get<string>('DB_PASSWORD'),
           entities: [__dirname + '/**/*.entity{.ts,.js}'],
           synchronize: configService.get<boolean>('SYNC'),
-          logging: true,
+          //logging: true,
         };
       },
     }),
-    /* ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '../../build'),
-    }), */
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '../build'),
+    }),
     RankModule,
     BatchModule,
     PlayerModule,

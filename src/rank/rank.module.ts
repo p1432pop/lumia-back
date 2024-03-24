@@ -5,10 +5,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Ranking } from './ranking.entity';
 import { RankRepository } from './rank.repository';
 import { AxiosModule } from 'src/axios/axios.module';
-import { Game } from 'src/game/game.entity';
+import { Updated } from './updated.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Ranking, Game]), AxiosModule],
+  imports: [TypeOrmModule.forFeature([Ranking, Updated]), AxiosModule],
   controllers: [RankController],
   providers: [RankService, RankRepository],
   exports: [RankService],

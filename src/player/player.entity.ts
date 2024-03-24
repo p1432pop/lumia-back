@@ -5,14 +5,16 @@ export class Player extends BaseEntity {
   @PrimaryColumn()
   userNum: number;
 
-  @Column()
+  @Column({
+    length: 16,
+  })
   nickname: string;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   updated: Date;
 
-  @BeforeUpdate()
-  updateTimestamp() {
-    this.updated = new Date();
-  }
+  @Column({
+    default: 0,
+  })
+  lastGameId: number;
 }

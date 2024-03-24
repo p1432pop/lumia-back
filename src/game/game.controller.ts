@@ -7,6 +7,7 @@ export class GameController {
 
   @Get('/:gameId')
   get(@Param('gameId', ParseIntPipe) gameId: number) {
-    return this.gameService.get(gameId);
+    console.log(gameId);
+    return this.gameService.getFromAPI(gameId);
   }
 }

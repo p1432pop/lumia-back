@@ -17,78 +17,28 @@ export class AxiosService {
       },
     };
   }
-  async getSeasonRanking(season: number) {
+  async getSeasonRanking(season: number): Promise<Ranking[]> {
     const result = await axios.get(`https://open-api.bser.io/v1/rank/top/${season}/3`, this.option);
     return await this.getUserStatsByUserNums(
       result.data.topRanks.map((user: { userNum: number }) => user.userNum),
       season,
     );
   }
-  async getGamesByGameIds(gameIds: number[]) {
-    let URIs: string[] = [];
-    gameIds.forEach((gameId: number) => {
-      URIs.push(`https://open-api.bser.io/v1/games/${gameId}`);
-    });
-    let results = [];
+  async getGamesByGameIds(gameIds: number[]): Promise<Game[]> {
+    let URIs: string[] = gameIds.map((gameId) => `https://open-api.bser.io/v1/games/${gameId}`);
     let res = await Promise.all(URIs.map((endpoint: string) => axios.get(endpoint, this.option)));
+    let results = [];
     res.forEach((item) => {
       if (item.data.code === 200 && item.data.userGames[0].seasonId > 0) {
         item.data.userGames.forEach((user) => {
-          let game = new Game();
-          game.userNum = user.userNum;
-          game.gameId = user.gameId;
-          game.versionMajor = user.versionMajor;
-          game.versionMinor = user.versionMinor;
-          game.characterNum = user.characterNum;
-          game.characterLevel = user.characterLevel;
-          game.gameRank = user.gameRank;
-          game.playerKill = user.playerKill;
-          game.playerAssistant = user.playerAssistant;
-          game.monsterKill = user.monsterKill;
-          game.bestWeapon = user.bestWeapon;
-          game.bestWeaponLevel = user.bestWeaponLevel;
-          game.masteryLevel = JSON.stringify(user.masteryLevel);
-          game.equipment = JSON.stringify(user.equipment);
-          game.startDtm = user.startDtm;
-          game.duration = user.duration;
-          game.mmrBefore = user.mmrBefore;
-          game.mmrAfter = user.mmrAfter;
-          game.mmrGain = user.mmrGain;
-          game.victory = user.victory;
-          game.damageFromMonster = user.damageFromMonster;
-          game.damageFromPlayer = user.damageFromPlayer;
-          game.damageToMonster = user.damageToMonster;
-          game.damageToPlayer = user.damageToPlayer;
-          game.killMonsters = JSON.stringify(user.killMonsters);
-          game.healAmount = user.healAmount;
-          game.teamRecover = user.teamRecover;
-          game.addSurveillanceCamera = user.addSurveillanceCamera;
-          game.addTelephotoCamera = user.addTelephotoCamera;
-          game.removeSurveillanceCamera = user.removeSurveillanceCamera;
-          game.removeTelephotoCamera = user.removeTelephotoCamera;
-          game.giveUp = user.giveUp;
-          game.matchSize = user.matchSize;
-          game.teamKill = user.teamKill;
-          game.accountLevel = user.accountLevel;
-          game.traitFirstCore = user.traitFirstCore;
-          game.traitFirstSub = JSON.stringify(user.traitFirstSub);
-          game.traitSecondSub = JSON.stringify(user.traitSecondSub);
-          game.escapeState = user.escapeState;
-          game.tacticalSkillGroup = user.tacticalSkillGroup;
-          game.tacticalSkillLevel = user.tacticalSkillLevel;
-          game.totalGainVFCredit = user.totalGainVFCredit;
-          results.push(game);
+          results.push(user);
         });
       }
     });
     return results;
   }
   async getUserStatsByUserNums(userNums: number[], season: number): Promise<Ranking[]> {
-    let URIs: string[] = [];
-    userNums.forEach((userNum: number) => {
-      URIs.push(`https://open-api.bser.io/v1/user/stats/${userNum}/${season}`);
-    });
-
+    let URIs: string[] = userNums.map((userNum: number) => `https://open-api.bser.io/v1/user/stats/${userNum}/${season}`);
     let results = [];
     let chunkedURIs = this.chunkArray(URIs, 40); // Split URIs into chunks of 40
 
@@ -98,31 +48,34 @@ export class AxiosService {
       console.log(new Date());
       let res = await Promise.all(targetURIs.map((endpoint: string) => axios.get(endpoint, this.option)));
       res.forEach((item) => {
-        let data = item.data.userStats[0];
-        const player = new Ranking();
-        player.userNum = data.userNum;
-        player.seasonId = data.seasonId;
-        player.nickname = data.nickname;
-        player.rank = data.rank;
-        player.mmr = data.mmr;
-        player.totalGames = data.totalGames;
-        player.top1 = data.top1;
-        player.top3 = data.top3;
-        player.averageRank = data.averageRank;
-        player.averageKills = data.averageKills;
-        data.characterStats.forEach((item, idx) => {
-          if (idx === 0) {
-            player.characterCode1 = item.characterCode;
-            player.charTotal1 = item.totalGames;
-          } else if (idx === 1) {
-            player.characterCode2 = item.characterCode;
-            player.charTotal2 = item.totalGames;
-          } else if (idx === 2) {
-            player.characterCode3 = item.characterCode;
-            player.charTotal3 = item.totalGames;
-          }
+        const { data } = item;
+        const { userStats } = data;
+        const userStat = userStats.pop();
+        const { characterStats } = userStat;
+        const { userNum, seasonId, nickname, rank, mmr, totalGames, top1, top3, averageRank, averageKills } = userStat;
+        const characterInfo = characterStats.slice(0, 3).map((charStat: { characterCode: number; totalGames: number }) => ({
+          characterCode: charStat.characterCode,
+          totalGames: charStat.totalGames,
+        }));
+        const [character1, character2, character3] = characterInfo;
+        results.push({
+          userNum,
+          seasonId,
+          nickname,
+          rank,
+          mmr,
+          totalGames,
+          top1,
+          top3,
+          averageRank,
+          averageKills,
+          characterCode1: character1?.characterCode,
+          charTotal1: character1?.totalGames,
+          characterCode2: character2?.characterCode,
+          charTotal2: character2?.totalGames,
+          characterCode3: character3?.characterCode,
+          charTotal3: character3?.totalGames,
         });
-        results.push(player);
       });
 
       // Add delay between chunks, except for the last chunk
@@ -144,7 +97,7 @@ export class AxiosService {
 
   async getGameByGameId(gameId: number): Promise<any> {
     const result = await axios.get(`https://open-api.bser.io/v1/games/${gameId}`, this.option);
-    return result.data.userGames;
+    return result.data;
   }
   async getUserNumByNickname(nickname: string): Promise<number> {
     const result = await axios.get(`https://open-api.bser.io/v1/user/nickname?query=${nickname}`, this.option);
@@ -160,15 +113,22 @@ export class AxiosService {
     return result.data.userRank.rank;
   }
 
-  async getGamesByUserNum(userNum: number, next?: number): Promise<{ userGames: Array<Object>; next: number }> {
+  async getGamesByUserNum(userNum: number, next?: number): Promise<{ userGames: Array<any>; next: number }> {
     let url = `https://open-api.bser.io/v1/user/games/${userNum}`;
     if (next) {
       url += `?next=${next}`;
     }
     const result = await axios.get(url, this.option);
-    return {
-      userGames: result.data.userGames,
-      next: result.data.next,
-    };
+    if (result.data.code === 404) {
+      return {
+        userGames: [],
+        next: undefined,
+      };
+    } else if (result.data.code === 200) {
+      return {
+        userGames: result.data.userGames,
+        next: result.data.next,
+      };
+    }
   }
 }
