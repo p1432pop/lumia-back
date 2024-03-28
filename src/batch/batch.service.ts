@@ -5,15 +5,15 @@ import { RankService } from 'src/rank/rank.service';
 
 @Injectable()
 export class BatchService {
-  private gameId: number;
+  private readonly currentSeasonId: number;
   constructor(
     private readonly configService: ConfigService,
     private readonly rankService: RankService,
   ) {
-    this.gameId = parseInt(this.configService.get<string>('FIRST_GAME_ID'));
+    this.currentSeasonId = parseInt(this.configService.get<string>('CURRENT_SEASON_ID'));
   }
-  @Cron('*/2 * * * 1 *')
+  @Cron('0 * * * *')
   updateRanking() {
-    console.log(1);
+    this.rankService.updateRanking(this.currentSeasonId);
   }
 }
