@@ -3,17 +3,18 @@ import { Ranking } from './ranking.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Updated } from './updated.entity';
+import { RankFetchDTO } from './dto/rank-fetch.dto';
 
 @Injectable()
 export class RankRepository {
   constructor(
+    private readonly datasource: DataSource,
     @InjectRepository(Ranking)
     private readonly rankRepository: Repository<Ranking>,
     @InjectRepository(Updated)
     private readonly updatedRepository: Repository<Updated>,
-    private readonly datasource: DataSource,
   ) {}
-  async getRanking(seasonId: number): Promise<{ data: Ranking[]; updated: Date }> {
+  async getRanking(seasonId: number): Promise<RankFetchDTO> {
     const data = await this.rankRepository.find({
       order: {
         mmr: 'DESC',
@@ -33,7 +34,7 @@ export class RankRepository {
     };
   }
 
-  async updateRanking(users: Ranking[], seasonId: number) {
+  async updateRanking(users: Ranking[], seasonId: number): Promise<void> {
     const qr = this.datasource.createQueryRunner();
     await qr.connect();
     await qr.startTransaction();

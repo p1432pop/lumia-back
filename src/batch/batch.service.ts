@@ -14,6 +14,6 @@ export class BatchService {
   }
   @Cron('0 * * * *')
   updateRanking() {
-    this.rankService.updateRanking(this.currentSeasonId);
+    //this.rankService.updateRanking(this.currentSeasonId);
   }
 }

@@ -7,6 +7,7 @@ import { join } from 'path';
 import { BatchModule } from './batch/batch.module';
 import { PlayerModule } from './player/player.module';
 import { GameModule } from './game/game.module';
+import { CacheModule } from '@nestjs/cache-manager';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -18,7 +19,7 @@ import { GameModule } from './game/game.module';
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
         return {
-          type: 'mysql',
+          type: 'postgres',
           host: configService.get<string>('DB_HOST'),
           port: configService.get<number>('DB_PORT'),
           username: configService.get<string>('DB_USER'),
@@ -30,6 +31,7 @@ import { GameModule } from './game/game.module';
         };
       },
     }),
+    CacheModule.register({ isGlobal: true, ttl: 1800000 }),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '../build'),
     }),

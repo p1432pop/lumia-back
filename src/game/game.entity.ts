@@ -81,7 +81,7 @@ export class Game extends BaseEntity {
   damageFromMonster: number;
 
   @Column({
-    length: 60,
+    length: 80,
   })
   killMonsters: string;
 

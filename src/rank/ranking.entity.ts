@@ -12,9 +12,6 @@ export class Ranking extends BaseEntity {
   nickname: string;
 
   @Column()
-  rank: number;
-
-  @Column()
   mmr: number;
 
   @Column()

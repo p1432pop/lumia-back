@@ -1,14 +1,32 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, OnModuleInit } from '@nestjs/common';
 import { GameRepository } from './game.repository';
 import { AxiosService } from 'src/axios/axios.service';
 import { Game } from './game.entity';
+import { readFileSync, writeFileSync } from 'fs';
 
 @Injectable()
-export class GameService {
+export class GameService implements OnModuleInit {
+  private LAST_GAME_ID: number;
   constructor(
     private readonly gameRepository: GameRepository,
     private readonly axiosService: AxiosService,
-  ) {}
+  ) {
+    const data = readFileSync('src/game/data.json');
+    this.LAST_GAME_ID = JSON.parse(data.toString()).LAST_GAME_ID;
+  }
+  async onModuleInit() {
+    /* while (true) {
+      console.log(new Date());
+      let gameIds = [];
+      for (let i = 0; i < 45; i++) {
+        gameIds.push(this.LAST_GAME_ID + i);
+      }
+      let games = await this.axiosService.getGamesByGameIds(gameIds);
+      this.LAST_GAME_ID += 45;
+      await this.insertGames(games);
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+    } */
+  }
   async getFromAPI(gameId: number) {
     return await this.axiosService.getGameByGameId(gameId);
   }

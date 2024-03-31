@@ -26,16 +26,24 @@ export class AxiosService {
   }
   async getGamesByGameIds(gameIds: number[]): Promise<Game[]> {
     let URIs: string[] = gameIds.map((gameId) => `https://open-api.bser.io/v1/games/${gameId}`);
-    let res = await Promise.all(URIs.map((endpoint: string) => axios.get(endpoint, this.option)));
-    let results = [];
-    res.forEach((item) => {
-      if (item.data.code === 200 && item.data.userGames[0].seasonId > 0) {
-        item.data.userGames.forEach((user) => {
-          results.push(user);
+    let retry = 1;
+    while (retry++ <= 5) {
+      try {
+        let res = await Promise.all(URIs.map((endpoint: string) => axios.get(endpoint, this.option)));
+        let results = [];
+        res.forEach((item) => {
+          if (item.data.code === 200 && item.data.userGames[0].seasonId > 0) {
+            item.data.userGames.forEach((user) => {
+              results.push(user);
+            });
+          }
         });
+        return results;
+      } catch (err) {
+        console.log('ETIMEDOUT');
+        await new Promise((resolve) => setTimeout(resolve, 1000 * retry));
       }
-    });
-    return results;
+    }
   }
   async getUserStatsByUserNums(userNums: number[], season: number): Promise<Ranking[]> {
     let URIs: string[] = userNums.map((userNum: number) => `https://open-api.bser.io/v1/user/stats/${userNum}/${season}`);
