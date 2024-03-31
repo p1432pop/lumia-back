@@ -3,7 +3,7 @@ import { Ranking } from './ranking.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Updated } from './updated.entity';
-import { RankFetchDTO } from './dto/rank-fetch.dto';
+import { RankRO } from './rank.interface';
 
 @Injectable()
 export class RankRepository {
@@ -14,7 +14,7 @@ export class RankRepository {
     @InjectRepository(Updated)
     private readonly updatedRepository: Repository<Updated>,
   ) {}
-  async getRanking(seasonId: number): Promise<RankFetchDTO> {
+  async getRanking(seasonId: number): Promise<RankRO> {
     const data = await this.rankRepository.find({
       order: {
         mmr: 'DESC',

@@ -24,7 +24,7 @@ export class PlayerRepository {
       where: { userNum },
     });
   }
-  async create(player: Player) {
+  async create(player: Player): Promise<void> {
     const dto = this.playerRepository.create(player);
     this.playerRepository.save(dto);
   }
@@ -35,7 +35,7 @@ export class PlayerRepository {
     });
     this.playerRepository.save(dto);
   }
-  async updatePlayer(player: Player) {
+  async updatePlayer(player: Player): Promise<Player> {
     return await this.playerRepository.save(player);
   }
 }

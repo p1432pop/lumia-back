@@ -3,7 +3,7 @@ import { RankRepository } from './rank.repository';
 import { AxiosService } from 'src/axios/axios.service';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
-import { RankFetchDTO } from './dto/rank-fetch.dto';
+import { RankRO } from './rank.interface';
 
 @Injectable()
 export class RankService {
@@ -12,8 +12,8 @@ export class RankService {
     private readonly axiosService: AxiosService,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
-  async getRanking(seasonId: number): Promise<RankFetchDTO> {
-    let value: RankFetchDTO = await this.cacheManager.get(seasonId.toString());
+  async getRanking(seasonId: number): Promise<RankRO> {
+    let value: RankRO = await this.cacheManager.get(seasonId.toString());
     if (!value) {
       value = await this.rankRepository.getRanking(seasonId);
       await this.cacheManager.set(seasonId.toString(), value);

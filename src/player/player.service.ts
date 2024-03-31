@@ -4,6 +4,7 @@ import { PlayerRepository } from './player.repository';
 import { GameService } from 'src/game/game.service';
 import { UpdatePlayerDto } from './dto/update-player.dto';
 import { Player } from './player.entity';
+import { PlayerRO } from './player.interface';
 
 @Injectable()
 export class PlayerService {
@@ -12,7 +13,7 @@ export class PlayerService {
     private readonly playerRepository: PlayerRepository,
     private readonly gameService: GameService,
   ) {}
-  async get(nickname: string, seasonId: number) {
+  async get(nickname: string, seasonId: number): Promise<PlayerRO> {
     const userNum = await this.axiosService.getUserNumByNickname(nickname);
     const result = await this.playerRepository.getPlayerByUserNum(userNum);
     if (result) {
@@ -45,7 +46,7 @@ export class PlayerService {
       };
     }
   }
-  async post(updatePlayerDto: UpdatePlayerDto) {
+  async post(updatePlayerDto: UpdatePlayerDto): Promise<PlayerRO> {
     const { userNum, nickname, lastGameId } = updatePlayerDto;
     let flag: boolean = true;
     let games = [];
@@ -78,6 +79,7 @@ export class PlayerService {
     games = await this.gameService.getFromDB(userNum);
     return {
       view: 1,
+      nickname,
       userNum,
       games,
       updated: result.updated,
