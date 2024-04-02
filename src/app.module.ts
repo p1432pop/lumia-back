@@ -26,12 +26,12 @@ import { CacheModule } from '@nestjs/cache-manager';
           database: configService.get<string>('DB_NAME'),
           password: configService.get<string>('DB_PASSWORD'),
           entities: [__dirname + '/**/*.entity{.ts,.js}'],
-          synchronize: configService.get<boolean>('SYNC'),
+          synchronize: false,
           //logging: true,
         };
       },
     }),
-    CacheModule.register({ isGlobal: true, ttl: 1800000 }),
+    CacheModule.register({ isGlobal: true, ttl: 600000 }),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '../build'),
     }),
