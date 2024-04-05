@@ -34,6 +34,10 @@ export class AxiosService {
         res.forEach((item) => {
           if (item.data.code === 200 && item.data.userGames[0].seasonId > 0) {
             item.data.userGames.forEach((user) => {
+              if (user.traitFirstSub.length !== 2 || user.traitSecondSub.length !== 2) {
+                user.traitFirstSub = [0, 0];
+                user.traitSecondSub = [0, 0];
+              }
               results.push(user);
             });
           }
