@@ -1,4 +1,4 @@
-import { BaseEntity, BeforeUpdate, Column, Entity, PrimaryColumn, UpdateDateColumn } from 'typeorm';
+import { BaseEntity, Column, Entity, PrimaryColumn } from 'typeorm';
 
 @Entity('player')
 export class Player extends BaseEntity {

@@ -4,7 +4,7 @@ import { PlayerRepository } from './player.repository';
 import { GameService } from 'src/game/game.service';
 import { UpdatePlayerDto } from './dto/update-player.dto';
 import { Player } from './player.entity';
-import { PlayerRO } from './player.interface';
+import { PlayerAllRO, PlayerRO, ViewStatus } from './player.interface';
 
 @Injectable()
 export class PlayerService {
@@ -13,39 +13,52 @@ export class PlayerService {
     private readonly playerRepository: PlayerRepository,
     private readonly gameService: GameService,
   ) {}
-  async get(nickname: string, seasonId: number): Promise<PlayerRO> {
+
+  renewable(updated: Date): boolean {
+    return new Date().getTime() - updated.getTime() > 5 * 60 * 1000;
+  }
+
+  async getRecentData(nickname: string, seasonId: number): Promise<PlayerAllRO> {
     const userNum = await this.axiosService.getUserNumByNickname(nickname);
     const result = await this.playerRepository.getPlayerByUserNum(userNum);
     if (result) {
-      //DB에 있는 플레이어
-      const games = await this.gameService.getFromDB(userNum);
+      const games = await this.gameService.getFromDB(userNum, result.lastGameId);
       const rank = await this.axiosService.getRankByUserNum(userNum, seasonId);
-      const ret = {
-        view: 2,
-        nickname,
-        userNum,
-        games,
-        lastGameId: result.lastGameId,
-        updated: result.updated,
-        rank,
-      };
-      if (new Date().getTime() - result.updated.getTime() < 5 * 60 * 1000) {
-        ret.view = 1;
-      }
-      return ret;
-    } else {
-      //DB에 없는 플레이어
       return {
-        view: 3,
+        playerData: {
+          view: this.renewable(result.updated) ? ViewStatus.OLD : ViewStatus.NEW,
+          nickname,
+          userNum,
+          games,
+          next: games.length === 20 ? games.at(-1).gameId - 1 : undefined,
+          accountLevel: games.length > 0 ? games[0].accountLevel : undefined,
+          characterCode: games.length > 0 ? games[0].characterNum : undefined,
+          mmr: games.length > 0 ? games[0].mmrAfter : undefined,
+          updated: result.updated,
+          rank,
+        },
+        playerStats: await this.gameService.getUserStats(userNum),
+      };
+    }
+    return {
+      playerData: {
+        view: ViewStatus.OLD,
         nickname,
         userNum,
         games: [],
-        lastGameId: 0,
-        updated: null,
-        rank: null,
-      };
-    }
+      },
+      playerStats: [],
+    };
   }
+
+  async getPastData(userNum: number, next: number) {
+    const games = await this.gameService.getFromDB(userNum, next);
+    return {
+      games,
+      next: games.length === 20 ? games.at(-1).gameId - 1 : undefined,
+    };
+  }
+
   async post(updatePlayerDto: UpdatePlayerDto): Promise<PlayerRO> {
     const { userNum, nickname, lastGameId } = updatePlayerDto;
     let flag: boolean = true;
@@ -76,14 +89,14 @@ export class PlayerService {
     player.updated = new Date();
     const result = await this.playerRepository.updatePlayer(player);
     const rank = await this.axiosService.getRankByUserNum(userNum, 23);
-    games = await this.gameService.getFromDB(userNum);
+    games = await this.gameService.getFromDB(userNum, lastGameId);
     return {
-      view: 1,
+      view: ViewStatus.NEW,
       nickname,
       userNum,
       games,
       updated: result.updated,
-      lastGameId: result.lastGameId,
+      next: result.lastGameId,
       rank,
     };
   }
