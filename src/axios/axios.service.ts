@@ -1,35 +1,34 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import axios from 'axios';
+import axios, { AxiosInstance } from 'axios';
 import { Game } from 'src/game/game.entity';
 import { Ranking } from 'src/rank/ranking.entity';
 
 @Injectable()
 export class AxiosService {
-  private readonly option: {
-    headers: { 'Content-Type': string; 'x-api-key': string };
-  };
+  private readonly axiosInstance: AxiosInstance;
   constructor(private readonly configService: ConfigService) {
-    this.option = {
+    this.axiosInstance = axios.create({
+      baseURL: 'https://open-api.bser.io/v1',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': this.configService.get<string>('BSER_API_KEY'),
+        'x-api-key': configService.get<string>('BSER_API_KEY'),
       },
-    };
+    });
   }
   async getSeasonRanking(season: number): Promise<Ranking[]> {
-    const result = await axios.get(`https://open-api.bser.io/v1/rank/top/${season}/3`, this.option);
+    const result = await this.axiosInstance.get(`/rank/top/${season}/3`);
     return await this.getUserStatsByUserNums(
       result.data.topRanks.map((user: { userNum: number }) => user.userNum),
       season,
     );
   }
   async getGamesByGameIds(gameIds: number[]): Promise<Game[]> {
-    let URIs: string[] = gameIds.map((gameId) => `https://open-api.bser.io/v1/games/${gameId}`);
+    let URIs: string[] = gameIds.map((gameId) => `/games/${gameId}`);
     let retry = 1;
     while (retry++ <= 5) {
       try {
-        let res = await Promise.all(URIs.map((endpoint: string) => axios.get(endpoint, this.option)));
+        let res = await Promise.all(URIs.map((endpoint: string) => this.axiosInstance.get(endpoint)));
         let results = [];
         res.forEach((item) => {
           if (item.data.code === 200 && item.data.userGames[0].seasonId > 0) {
@@ -50,7 +49,7 @@ export class AxiosService {
     }
   }
   async getUserStatsByUserNums(userNums: number[], season: number): Promise<Ranking[]> {
-    let URIs: string[] = userNums.map((userNum: number) => `https://open-api.bser.io/v1/user/stats/${userNum}/${season}`);
+    let URIs: string[] = userNums.map((userNum: number) => `/user/stats/${userNum}/${season}`);
     let results = [];
     let chunkedURIs = this.chunkArray(URIs, 40); // Split URIs into chunks of 40
 
@@ -58,7 +57,7 @@ export class AxiosService {
     for (let i = 0; i < chunkedURIs.length; i++) {
       let targetURIs = chunkedURIs[i];
       console.log(new Date());
-      let res = await Promise.all(targetURIs.map((endpoint: string) => axios.get(endpoint, this.option)));
+      let res = await Promise.all(targetURIs.map((endpoint: string) => this.axiosInstance.get(endpoint)));
       res.forEach((item) => {
         const { data } = item;
         const { userStats } = data;
@@ -108,11 +107,11 @@ export class AxiosService {
   }
 
   async getGameByGameId(gameId: number): Promise<any> {
-    const result = await axios.get(`https://open-api.bser.io/v1/games/${gameId}`, this.option);
+    const result = await this.axiosInstance.get(`/games/${gameId}`);
     return result.data;
   }
   async getUserNumByNickname(nickname: string): Promise<number> {
-    const result = await axios.get(`https://open-api.bser.io/v1/user/nickname?query=${nickname}`, this.option);
+    const result = await this.axiosInstance.get(`/user/nickname?query=${nickname}`);
     if (result.data.code === 404) {
       throw new NotFoundException();
     } else if (result.data.code === 200) {
@@ -121,16 +120,16 @@ export class AxiosService {
   }
 
   async getRankByUserNum(userNum: number, season: number): Promise<number> {
-    const result = await axios.get(`https://open-api.bser.io/v1/rank/${userNum}/${season}/3`, this.option);
+    const result = await this.axiosInstance.get(`/rank/${userNum}/${season}/3`);
     return result.data.userRank.rank;
   }
 
   async getGamesByUserNum(userNum: number, next?: number): Promise<{ userGames: Array<any>; next: number }> {
-    let url = `https://open-api.bser.io/v1/user/games/${userNum}`;
+    let url = `/user/games/${userNum}`;
     if (next) {
       url += `?next=${next}`;
     }
-    const result = await axios.get(url, this.option);
+    const result = await this.axiosInstance.get(url);
     if (result.data.code === 404) {
       return {
         userGames: [],
