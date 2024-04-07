@@ -14,14 +14,14 @@ export class RankRepository {
     @InjectRepository(Updated)
     private readonly updatedRepository: Repository<Updated>,
   ) {}
-  async getRanking(seasonId: number, page: number): Promise<RankRO> {
+  async getRanking(seasonId: number, page: number, count: number = 100): Promise<RankRO> {
     const data = await this.rankRepository.find({
       order: {
         mmr: 'DESC',
         nickname: 'ASC',
       },
       where: { seasonId },
-      take: 100,
+      take: count,
       skip: (page - 1) * 100,
     });
     const updated = await this.updatedRepository.findOne({
