@@ -19,7 +19,7 @@ export class PlayerController {
   }
   @Post()
   @UsePipes(ValidationPipe)
-  async updatePlayer(@Body() updatePlayerDto: UpdatePlayerDto): Promise<PlayerRO> {
+  async updatePlayer(@Body() updatePlayerDto: UpdatePlayerDto): Promise<PlayerAllRO> {
     return await this.playerService.post(updatePlayerDto);
   }
 }

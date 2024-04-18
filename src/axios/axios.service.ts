@@ -12,7 +12,7 @@ export class AxiosService {
       baseURL: 'https://open-api.bser.io/v1',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': configService.get<string>('BSER_API_KEY'),
+        'x-api-key': this.configService.get<string>('BSER_API_KEY'),
       },
     });
   }
@@ -51,7 +51,7 @@ export class AxiosService {
   async getUserStatsByUserNums(userNums: number[], season: number): Promise<Ranking[]> {
     let URIs: string[] = userNums.map((userNum: number) => `/user/stats/${userNum}/${season}`);
     let results = [];
-    let chunkedURIs = this.chunkArray(URIs, 40); // Split URIs into chunks of 40
+    let chunkedURIs = this.chunkArray(URIs, 20); // Split URIs into chunks of 20
 
     // Create an array to hold all promises
     for (let i = 0; i < chunkedURIs.length; i++) {

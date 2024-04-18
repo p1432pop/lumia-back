@@ -59,8 +59,17 @@ export class PlayerService {
     };
   }
 
-  async post(updatePlayerDto: UpdatePlayerDto): Promise<PlayerRO> {
-    const { userNum, nickname, lastGameId } = updatePlayerDto;
+  async post(updatePlayerDto: UpdatePlayerDto): Promise<PlayerAllRO> {
+    const { userNum, nickname } = updatePlayerDto;
+    const lastGameId = await this.gameService.getLastGameId(userNum);
+    let player = new Player();
+    player.userNum = userNum;
+    player.nickname = nickname;
+    player.lastGameId = lastGameId || 0;
+    player.updated = new Date();
+    await this.playerRepository.updatePlayer(player);
+    return await this.getRecentData(nickname, 23);
+    /* const { userNum, nickname, lastGameId } = updatePlayerDto;
     let flag: boolean = true;
     let games = [];
     let next: number | undefined = undefined;
@@ -98,6 +107,6 @@ export class PlayerService {
       updated: result.updated,
       next: result.lastGameId,
       rank,
-    };
+    }; */
   }
 }

@@ -8,8 +8,4 @@ export class UpdatePlayerDto {
   @IsString()
   @IsNotEmpty()
   readonly nickname: string;
-
-  @IsNumber()
-  @IsNotEmpty()
-  readonly lastGameId: number;
 }

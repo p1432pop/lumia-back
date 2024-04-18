@@ -30,12 +30,18 @@ export class GameService implements OnModuleInit {
   async getFromAPI(gameId: number) {
     return await this.axiosService.getGameByGameId(gameId);
   }
-  async getFromDB(userNum: number, next: number) {
-    return await this.gameRepository.get(userNum, next);
+  async getFromDB(userNum: number, next: number): Promise<Game[]> {
+    return await this.gameRepository.getGamesByUserNum(userNum, next);
+  }
+  async getGameByGameId(gameId: number): Promise<Game[]> {
+    return await this.gameRepository.getGameByGameId(gameId);
   }
   async getUserStats(userNum: number) {
     const result = await this.gameRepository.getUserStats(userNum);
     return result;
+  }
+  async getLastGameId(userNum: number): Promise<number> {
+    return await this.gameRepository.getLastGameId(userNum);
   }
   async insertGames(games): Promise<void> {
     this.gameRepository.insertGames(games.map((game) => this.toGameEntity(game)));
