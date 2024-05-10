@@ -29,9 +29,24 @@ export class GameRepository {
       where: {
         gameId,
       },
+      order: {
+        gameRank: 'ASC',
+      },
     });
   }
-  async getLastGameId(userNum: number): Promise<number> {
+  async getTotalLastGameId(): Promise<number> {
+    const result = await this.gameRepository.findOne({
+      select: {
+        gameId: true,
+      },
+      order: {
+        gameId: 'DESC',
+      },
+    });
+    if (result) return result.gameId;
+    else return 0;
+  }
+  async getPlayerLastGameId(userNum: number): Promise<number> {
     const result = await this.gameRepository.findOne({
       select: {
         gameId: true,

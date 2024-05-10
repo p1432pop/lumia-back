@@ -1,5 +1,5 @@
 import { Repository } from 'typeorm';
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Player } from './player.entity';
 
@@ -9,7 +9,7 @@ export class PlayerRepository {
     @InjectRepository(Player)
     private readonly playerRepository: Repository<Player>,
   ) {}
-  async getPlayerByUserNum(userNum: number): Promise<Player> {
+  async getPlayerByUserNum(userNum: number): Promise<Player | null> {
     return await this.playerRepository.findOne({ where: { userNum } });
   }
   async getUpdatedByUserNum(userNum: number) {

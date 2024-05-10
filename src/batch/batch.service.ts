@@ -10,7 +10,7 @@ export class BatchService {
     private readonly configService: ConfigService,
     private readonly rankService: RankService,
   ) {
-    this.currentSeasonId = parseInt(this.configService.get<string>('CURRENT_SEASON_ID'));
+    this.currentSeasonId = parseInt(this.configService.get<string>('CURRENT_SEASON_ID') || '23');
   }
   @Cron('0 * * * *')
   updateRanking() {

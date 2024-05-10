@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import axios, { AxiosInstance } from 'axios';
 import { Game } from 'src/game/game.entity';
@@ -23,19 +23,32 @@ export class AxiosService {
       season,
     );
   }
+  async getGamesByGameIds2(gameIds: number[]) {
+    let URIs: string[] = gameIds.map((gameId) => `/games/${gameId}`);
+    let retry = 1;
+    while (retry++ <= 5) {
+      try {
+        let res = await Promise.all(URIs.map((endpoint: string) => this.axiosInstance.get(endpoint)));
+        return res;
+      } catch (err) {
+        console.log('ETIMEDOUT');
+        await new Promise((resolve) => setTimeout(resolve, 1000 * retry));
+      }
+    }
+  }
   async getGamesByGameIds(gameIds: number[]): Promise<Game[]> {
     let URIs: string[] = gameIds.map((gameId) => `/games/${gameId}`);
     let retry = 1;
     while (retry++ <= 5) {
       try {
         let res = await Promise.all(URIs.map((endpoint: string) => this.axiosInstance.get(endpoint)));
-        let results = [];
+        let results: Game[] = [];
         res.forEach((item) => {
           if (item.data.code === 200 && item.data.userGames[0].seasonId > 0) {
-            item.data.userGames.forEach((user) => {
+            item.data.userGames.forEach((user: Game) => {
               if (user.traitFirstSub.length !== 2 || user.traitSecondSub.length !== 2) {
-                user.traitFirstSub = [0, 0];
-                user.traitSecondSub = [0, 0];
+                user.traitFirstSub = '[0, 0]';
+                user.traitSecondSub = '[0, 0]';
               }
               results.push(user);
             });
@@ -47,10 +60,11 @@ export class AxiosService {
         await new Promise((resolve) => setTimeout(resolve, 1000 * retry));
       }
     }
+    throw new InternalServerErrorException();
   }
   async getUserStatsByUserNums(userNums: number[], season: number): Promise<Ranking[]> {
     let URIs: string[] = userNums.map((userNum: number) => `/user/stats/${userNum}/${season}`);
-    let results = [];
+    let results: Ranking[] = [];
     let chunkedURIs = this.chunkArray(URIs, 20); // Split URIs into chunks of 20
 
     // Create an array to hold all promises
@@ -73,7 +87,6 @@ export class AxiosService {
           userNum,
           seasonId,
           nickname,
-          rank,
           mmr,
           totalGames,
           top1,
@@ -99,7 +112,7 @@ export class AxiosService {
 
   // Function to split an array into chunks
   chunkArray(array: string[], size: number) {
-    let chunkedArray = [];
+    let chunkedArray: Array<string>[] = [];
     for (let i: number = 0; i < array.length; i += size) {
       chunkedArray.push(array.slice(i, i + size));
     }
@@ -112,11 +125,10 @@ export class AxiosService {
   }
   async getUserNumByNickname(nickname: string): Promise<number> {
     const result = await this.axiosInstance.get(`/user/nickname?query=${nickname}`);
-    if (result.data.code === 404) {
-      throw new NotFoundException();
-    } else if (result.data.code === 200) {
+    if (result.data.code === 200) {
       return result.data.user.userNum;
     }
+    throw new NotFoundException();
   }
 
   async getRankByUserNum(userNum: number, season: number): Promise<number> {
@@ -130,16 +142,12 @@ export class AxiosService {
       url += `?next=${next}`;
     }
     const result = await this.axiosInstance.get(url);
-    if (result.data.code === 404) {
-      return {
-        userGames: [],
-        next: undefined,
-      };
-    } else if (result.data.code === 200) {
+    if (result.data.code === 200) {
       return {
         userGames: result.data.userGames,
         next: result.data.next,
       };
     }
+    throw new NotFoundException();
   }
 }

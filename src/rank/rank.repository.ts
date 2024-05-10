@@ -1,6 +1,6 @@
 import { DataSource, Repository } from 'typeorm';
 import { Ranking } from './ranking.entity';
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Updated } from './updated.entity';
 import { RankRO } from './rank.interface';
@@ -29,10 +29,13 @@ export class RankRepository {
         seasonId,
       },
     });
-    return {
-      data,
-      updated: updated.updated,
-    };
+    if (data.length > 0 && updated) {
+      return {
+        data,
+        updated: updated.updated,
+      };
+    }
+    throw new NotFoundException();
   }
 
   async updateRanking(users: Ranking[], seasonId: number): Promise<void> {

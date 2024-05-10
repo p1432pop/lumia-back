@@ -15,7 +15,7 @@ export class PlayerController {
   }
   @Get('past/:userNum')
   async getPastData(@Param('userNum', ParseIntPipe) userNum: number, @Query('next', new DefaultValuePipe(0), ParseIntPipe) next: number) {
-    return this.playerService.getPastData(userNum, next);
+    return await this.playerService.getPastData(userNum, next);
   }
   @Post()
   @UsePipes(ValidationPipe)

@@ -1,7 +1,7 @@
-import { BaseEntity, Column, Entity, PrimaryColumn } from 'typeorm';
+import { Column, Entity, PrimaryColumn } from 'typeorm';
 
 @Entity('Ranking')
-export class Ranking extends BaseEntity {
+export class Ranking {
   @PrimaryColumn()
   userNum: number;
 
