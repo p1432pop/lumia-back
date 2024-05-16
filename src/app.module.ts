@@ -8,6 +8,8 @@ import { BatchModule } from './batch/batch.module';
 import { PlayerModule } from './player/player.module';
 import { GameModule } from './game/game.module';
 import { CacheModule } from '@nestjs/cache-manager';
+import { NewsModule } from './news/news.module';
+import { ItemModule } from './item/item.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -39,6 +41,8 @@ import { CacheModule } from '@nestjs/cache-manager';
     BatchModule,
     PlayerModule,
     GameModule,
+    NewsModule,
+    ItemModule,
   ],
 })
 export class AppModule {}

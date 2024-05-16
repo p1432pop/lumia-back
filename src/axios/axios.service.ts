@@ -2,11 +2,13 @@ import { Injectable, InternalServerErrorException, NotFoundException } from '@ne
 import { ConfigService } from '@nestjs/config';
 import axios, { AxiosInstance } from 'axios';
 import { Game } from 'src/game/game.entity';
+import { news } from 'src/news/news.interface';
 import { Ranking } from 'src/rank/ranking.entity';
 
 @Injectable()
 export class AxiosService {
   private readonly axiosInstance: AxiosInstance;
+  private readonly axiosInstanceV2: AxiosInstance;
   constructor(private readonly configService: ConfigService) {
     this.axiosInstance = axios.create({
       baseURL: 'https://open-api.bser.io/v1',
@@ -15,6 +17,30 @@ export class AxiosService {
         'x-api-key': this.configService.get<string>('BSER_API_KEY'),
       },
     });
+    this.axiosInstanceV2 = axios.create({
+      baseURL: 'https://open-api.bser.io/v2/data',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': this.configService.get<string>('BSER_API_KEY'),
+      },
+    });
+  }
+  async getItemWeapon() {
+    const result = await this.axiosInstanceV2.get('/ItemWeapon');
+  }
+  async getItemArmor() {
+    const result = await this.axiosInstanceV2.get('/ItemArmor');
+  }
+  async getItemConsumable() {
+    const result = await this.axiosInstanceV2.get('/ItemConsumable');
+  }
+  async test(): Promise<news> {
+    const result = await axios.get('https://playeternalreturn.com/api/v1/posts/news?page=1', {
+      headers: {
+        'Accept-Language': 'ko',
+      },
+    });
+    return result.data;
   }
   async getSeasonRanking(season: number): Promise<Ranking[]> {
     const result = await this.axiosInstance.get(`/rank/top/${season}/3`);

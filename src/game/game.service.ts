@@ -70,8 +70,9 @@ export class GameService implements OnModuleInit {
   async getFromDB(userNum: number, next: number): Promise<Game[]> {
     return await this.gameRepository.getGamesByUserNum(userNum, next);
   }
-  async getGameByGameId(gameId: number): Promise<Game[]> {
-    return await this.gameRepository.getGameByGameId(gameId);
+  async getGameByGameId(gameId: number): Promise<Game[] | any> {
+    return await this.axiosService.test();
+    //return await this.gameRepository.getGameByGameId(gameId);
   }
   async getUserStats(userNum: number) {
     return await this.gameRepository.getUserStats(userNum);
