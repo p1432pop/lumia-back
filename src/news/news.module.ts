@@ -10,5 +10,6 @@ import { NewsRepository } from './news.repository';
   imports: [TypeOrmModule.forFeature([News]), AxiosModule],
   controllers: [NewsController],
   providers: [NewsService, NewsRepository],
+  exports: [NewsService],
 })
 export class NewsModule {}

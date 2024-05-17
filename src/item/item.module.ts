@@ -10,5 +10,6 @@ import { AxiosModule } from 'src/axios/axios.module';
   imports: [TypeOrmModule.forFeature([ItemConsumable, ItemWearable]), AxiosModule],
   controllers: [ItemController],
   providers: [ItemService, ItemRepository],
+  exports: [ItemService],
 })
 export class ItemModule {}

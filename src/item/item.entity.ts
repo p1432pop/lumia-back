@@ -1,8 +1,9 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { Column, Entity, PrimaryColumn, ValueTransformer } from 'typeorm';
 import { ConsumableType, ItemGrade, ItemType, WearableType } from './item-type.enum';
+import { ColumnNumericTransformer } from 'src/shared/transformer/string-number.transformer';
+import { NumericColumn } from 'src/shared/decorator/typeorm.decorator';
 
-@Entity('item_consumable')
-export class ItemConsumable {
+export abstract class Common {
   @PrimaryColumn()
   code: number;
 
@@ -15,14 +16,19 @@ export class ItemConsumable {
   itemType: ItemType;
 
   @Column({
-    enum: ConsumableType,
-  })
-  consumableType: ConsumableType;
-
-  @Column({
     enum: ItemGrade,
   })
   itemGrade: ItemGrade;
+
+  modeType: number;
+}
+
+@Entity('item_consumable')
+export class ItemConsumable extends Common {
+  @Column({
+    enum: ConsumableType,
+  })
+  consumableType: ConsumableType;
 
   @Column()
   hpRecover: number;
@@ -32,27 +38,11 @@ export class ItemConsumable {
 }
 
 @Entity('item_wearable')
-export class ItemWearable {
-  @PrimaryColumn()
-  code: number;
-
-  @Column()
-  name: string;
-
-  @Column({
-    enum: ItemType,
-  })
-  itemType: ItemType;
-
+export class ItemWearable extends Common {
   @Column({
     enum: WearableType,
   })
   wearableType: WearableType;
-
-  @Column({
-    enum: ItemGrade,
-  })
-  itemGrade: ItemGrade;
 
   @Column()
   attackPower: number;
@@ -84,72 +74,72 @@ export class ItemWearable {
   @Column()
   maxSp: number;
 
-  @Column()
+  @NumericColumn()
   hpRegenRatio: number;
 
-  @Column()
+  @NumericColumn()
   spRegenRatio: number;
 
   @Column()
   spRegen: number;
 
-  @Column()
+  @NumericColumn()
   attackSpeedRatio: number;
 
-  @Column()
+  @NumericColumn()
   attackSpeedRatioByLv: number;
 
-  @Column()
+  @NumericColumn()
   criticalStrikeChance: number;
 
-  @Column()
+  @NumericColumn()
   criticalStrikeDamage: number;
 
-  @Column()
+  @NumericColumn()
   cooldownReduction: number;
 
-  @Column()
+  @NumericColumn()
   lifeSteal: number;
 
-  @Column()
+  @NumericColumn()
   normalLifeSteal: number;
 
-  @Column()
+  @NumericColumn()
   moveSpeed: number;
 
-  @Column()
+  @NumericColumn()
   sightRange: number;
 
   @Column()
   preventBasicAttackDamagedRatio: number;
 
-  @Column()
+  @NumericColumn()
   increaseBasicAttackDamageRatioByLv: number;
 
-  @Column()
+  @NumericColumn()
   preventSkillDamagedRatio: number;
 
   @Column()
   penetrationDefense: number;
 
-  @Column()
+  @NumericColumn()
   penetrationDefenseRatio: number;
 
-  @Column()
+  @NumericColumn()
   healerGiveHpHealRatio: number;
 
-  @Column()
+  @NumericColumn()
   uniqueAttackRange: number;
 
-  @Column()
+  @NumericColumn()
   uniqueCooldownLimit: number;
 
-  @Column()
+  @NumericColumn()
   uniqueTenacity: number;
 
-  @Column()
+  @NumericColumn()
   uniqueMoveSpeed: number;
 
-  @Column()
+  @NumericColumn()
   uniqueSkillAmpRatio: number;
 }

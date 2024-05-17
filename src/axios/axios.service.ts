@@ -2,6 +2,7 @@ import { Injectable, InternalServerErrorException, NotFoundException } from '@ne
 import { ConfigService } from '@nestjs/config';
 import axios, { AxiosInstance } from 'axios';
 import { Game } from 'src/game/game.entity';
+import { ItemConsumable, ItemWearable } from 'src/item/item.entity';
 import { news } from 'src/news/news.interface';
 import { Ranking } from 'src/rank/ranking.entity';
 
@@ -27,12 +28,15 @@ export class AxiosService {
   }
   async getItemWeapon() {
     const result = await this.axiosInstanceV2.get('/ItemWeapon');
+    return result.data.data;
   }
   async getItemArmor() {
     const result = await this.axiosInstanceV2.get('/ItemArmor');
+    return result.data.data;
   }
-  async getItemConsumable() {
+  async getItemConsumable(): Promise<ItemConsumable[]> {
     const result = await this.axiosInstanceV2.get('/ItemConsumable');
+    return result.data.data;
   }
   async test(): Promise<news> {
     const result = await axios.get('https://playeternalreturn.com/api/v1/posts/news?page=1', {
