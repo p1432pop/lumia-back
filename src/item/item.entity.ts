@@ -1,6 +1,5 @@
-import { Column, Entity, PrimaryColumn, ValueTransformer } from 'typeorm';
+import { Column, Entity, PrimaryColumn } from 'typeorm';
 import { ConsumableType, ItemGrade, ItemType, WearableType } from './item-type.enum';
-import { ColumnNumericTransformer } from 'src/shared/transformer/string-number.transformer';
 import { NumericColumn } from 'src/shared/decorator/typeorm.decorator';
 
 export abstract class Common {

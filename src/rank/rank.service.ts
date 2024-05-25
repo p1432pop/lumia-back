@@ -5,6 +5,7 @@ import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
 import { RankRO } from './rank.interface';
 import { ConfigService } from '@nestjs/config';
+import { RankDTO } from './dto/rank.dto';
 
 @Injectable()
 export class RankService {
@@ -17,14 +18,24 @@ export class RankService {
   ) {
     this.seasonId = this.configService.get<number>('CURRENT_SEASON_ID') || 23;
   }
-  async getMainRanking(): Promise<RankRO> {
-    return await this.rankRepository.getRanking(this.seasonId, 1, 5);
+  async getMainRanking(): Promise<RankDTO> {
+    const topRanks = await this.rankRepository.getRanking(this.seasonId, 1, 5);
+    const { updated } = await this.rankRepository.getUpdatedTime(this.seasonId);
+    return {
+      topRanks,
+      updated,
+    };
   }
-  async getRanking(seasonId: number, page: number): Promise<RankRO> {
+  async getRanking(seasonId: number, page: number): Promise<RankDTO> {
     const key = seasonId.toString() + '_' + page.toString();
-    let value = await this.cacheManager.get<RankRO>(key);
+    let value = await this.cacheManager.get<RankDTO>(key);
     if (!value) {
-      value = await this.rankRepository.getRanking(seasonId, page);
+      const topRanks = await this.rankRepository.getRanking(seasonId, page);
+      const { updated } = await this.rankRepository.getUpdatedTime(seasonId);
+      value = {
+        topRanks,
+        updated,
+      };
       await this.cacheManager.set(key, value);
     }
     return value;

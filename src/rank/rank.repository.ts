@@ -14,8 +14,8 @@ export class RankRepository {
     @InjectRepository(Updated)
     private readonly updatedRepository: Repository<Updated>,
   ) {}
-  async getRanking(seasonId: number, page: number, count: number = 100): Promise<RankRO> {
-    const data = await this.rankRepository.find({
+  async getRanking(seasonId: number, page: number, count: number = 100): Promise<Ranking[]> {
+    const result = await this.rankRepository.find({
       order: {
         mmr: 'DESC',
         nickname: 'ASC',
@@ -24,17 +24,12 @@ export class RankRepository {
       take: count,
       skip: (page - 1) * 100,
     });
-    const updated = await this.updatedRepository.findOne({
-      where: {
-        seasonId,
-      },
-    });
-    if (data.length > 0 && updated) {
-      return {
-        data,
-        updated: updated.updated,
-      };
-    }
+    if (result.length > 0) return result;
+    throw new NotFoundException();
+  }
+  async getUpdatedTime(seasonId: number): Promise<Updated> {
+    const result = await this.updatedRepository.findOne({ where: { seasonId } });
+    if (result) return result;
     throw new NotFoundException();
   }
 
