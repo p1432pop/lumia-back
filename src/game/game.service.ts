@@ -3,6 +3,8 @@ import { GameRepository } from './game.repository';
 import { AxiosService } from 'src/axios/axios.service';
 import { Game } from './game.entity';
 import { DataSource } from 'typeorm';
+import { GameDTO } from './dto/game.dto';
+import { CharacterStats } from 'src/player/dto/player.dto';
 
 @Injectable()
 export class GameService implements OnModuleInit {
@@ -70,107 +72,16 @@ export class GameService implements OnModuleInit {
   async getFromDB(userNum: number, next: number): Promise<Game[]> {
     return await this.gameRepository.getGamesByUserNum(userNum, next);
   }
-  async getGameByGameId(gameId: number): Promise<Game[] | any> {
-    return await this.axiosService.test();
-    //return await this.gameRepository.getGameByGameId(gameId);
+  async getGameByGameId(gameId: number): Promise<GameDTO[]> {
+    return await this.gameRepository.getGameByGameId(gameId);
   }
-  async getUserStats(userNum: number) {
+  async getUserStats(userNum: number): Promise<CharacterStats[]> {
     return await this.gameRepository.getUserStats(userNum);
   }
   async getLastGameId(userNum: number): Promise<number> {
     return await this.gameRepository.getPlayerLastGameId(userNum);
   }
   async insertGames(games): Promise<void> {
-    await this.gameRepository.insertGames(games.map((game) => this.toGameEntity(game)));
-  }
-  toGameEntity(game) {
-    const {
-      userNum,
-      gameId,
-      versionMajor,
-      versionMinor,
-      characterNum,
-      characterLevel,
-      gameRank,
-      playerKill,
-      playerAssistant,
-      monsterKill,
-      bestWeapon,
-      bestWeaponLevel,
-      startDtm,
-      duration,
-      mmrBefore,
-      mmrAfter,
-      mmrGain,
-      victory,
-      damageFromMonster,
-      damageFromPlayer,
-      damageToMonster,
-      damageToPlayer,
-      healAmount,
-      teamRecover,
-      addSurveillanceCamera,
-      addTelephotoCamera,
-      removeSurveillanceCamera,
-      removeTelephotoCamera,
-      giveUp,
-      matchSize,
-      teamKill,
-      accountLevel,
-      traitFirstCore,
-      escapeState,
-      tacticalSkillGroup,
-      tacticalSkillLevel,
-      totalGainVFCredit,
-    } = game;
-    const masteryLevel = JSON.stringify(game.masteryLevel);
-    const equipment = JSON.stringify(game.equipment);
-    const killMonsters = JSON.stringify(game.killMonsters);
-    const traitFirstSub = JSON.stringify(game.traitFirstSub);
-    const traitSecondSub = JSON.stringify(game.traitSecondSub);
-    return {
-      userNum,
-      gameId,
-      versionMajor,
-      versionMinor,
-      characterNum,
-      characterLevel,
-      gameRank,
-      playerKill,
-      playerAssistant,
-      monsterKill,
-      bestWeapon,
-      bestWeaponLevel,
-      startDtm,
-      duration,
-      mmrBefore,
-      mmrAfter,
-      mmrGain,
-      victory,
-      damageFromMonster,
-      damageFromPlayer,
-      damageToMonster,
-      damageToPlayer,
-      healAmount,
-      teamRecover,
-      addSurveillanceCamera,
-      addTelephotoCamera,
-      removeSurveillanceCamera,
-      removeTelephotoCamera,
-      giveUp,
-      matchSize,
-      teamKill,
-      accountLevel,
-      traitFirstCore,
-      escapeState,
-      tacticalSkillGroup,
-      tacticalSkillLevel,
-      totalGainVFCredit,
-      masteryLevel,
-      equipment,
-      killMonsters,
-      traitFirstSub,
-      traitSecondSub,
-    };
+    await this.gameRepository.insertGames(games);
   }
 }

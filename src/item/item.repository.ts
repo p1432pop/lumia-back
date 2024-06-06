@@ -2,7 +2,7 @@ import { DataSource, Repository } from 'typeorm';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ItemConsumable, ItemWearable } from './item.entity';
-import { ConsumableType, ItemType, WearableType } from './item-type.enum';
+import { ConsumableType, ItemType, WeaponType, ArmorType } from './item-type.enum';
 
 @Injectable()
 export class ItemRepository {
@@ -38,11 +38,11 @@ export class ItemRepository {
     });
   }
 
-  async getItemArmor(wearableType: WearableType): Promise<ItemWearable[]> {
+  async getItemArmor(armorType: ArmorType): Promise<ItemWearable[]> {
     return await this.itemWearableRepository.find({
       where: {
         itemType: ItemType.Armor,
-        wearableType,
+        wearableType: armorType,
       },
       order: {
         itemGrade: 'ASC',
@@ -50,11 +50,11 @@ export class ItemRepository {
     });
   }
 
-  async getItemWeapon(wearableType: WearableType): Promise<ItemWearable[]> {
+  async getItemWeapon(weaponType: WeaponType): Promise<ItemWearable[]> {
     return await this.itemWearableRepository.find({
       where: {
         itemType: ItemType.Weapon,
-        wearableType,
+        wearableType: weaponType,
       },
       order: {
         itemGrade: 'ASC',

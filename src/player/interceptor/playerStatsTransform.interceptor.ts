@@ -1,11 +1,11 @@
-import { CallHandler, ExecutionContext, NestInterceptor } from '@nestjs/common';
+import { CallHandler, ExecutionContext, NestInterceptor, Type } from '@nestjs/common';
 import { Observable, map } from 'rxjs';
-import { PlayerAllRO } from '../player.interface';
+import { PlayerDTO } from '../dto/player.dto';
 
 export class PlayerStatsTransformInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     return next.handle().pipe(
-      map((data: PlayerAllRO) => {
+      map((data: PlayerDTO) => {
         data.playerStats.forEach((value) => {
           value.totalGames = Number(value.totalGames);
           value.wins = Number(value.wins);

@@ -3,7 +3,6 @@ import { Ranking } from './ranking.entity';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Updated } from './updated.entity';
-import { RankRO } from './rank.interface';
 
 @Injectable()
 export class RankRepository {

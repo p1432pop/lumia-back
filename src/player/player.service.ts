@@ -3,8 +3,7 @@ import { AxiosService } from 'src/axios/axios.service';
 import { PlayerRepository } from './player.repository';
 import { GameService } from 'src/game/game.service';
 import { UpdatePlayerDto } from './dto/update-player.dto';
-import { Player } from './player.entity';
-import { PlayerAllRO, ViewStatus } from './player.interface';
+import { PlayerDTO, PlayerPastDTO, ViewStatus } from './dto/player.dto';
 
 @Injectable()
 export class PlayerService {
@@ -19,7 +18,7 @@ export class PlayerService {
     return new Date().getTime() - updated.getTime() > 5 * 60 * 1000;
   }
 
-  async getRecentData(nickname: string, seasonId: number): Promise<PlayerAllRO> {
+  async getRecentData(nickname: string, seasonId: number): Promise<PlayerDTO> {
     const userNum = await this.axiosService.getUserNumByNickname(nickname);
     const result = await this.playerRepository.getPlayerByUserNum(userNum);
     if (result) {
@@ -52,17 +51,15 @@ export class PlayerService {
     };
   }
 
-  async getPastData(userNum: number, next: number) {
+  async getPastData(userNum: number, next: number): Promise<PlayerPastDTO> {
     const games = await this.gameService.getFromDB(userNum, next);
-    if (games) {
-      return {
-        games,
-        next: games.length === this.MAX_LENGTH ? games[this.MAX_LENGTH - 1].gameId - 1 : undefined,
-      };
-    }
+    return {
+      games,
+      next: games.length === this.MAX_LENGTH ? games[this.MAX_LENGTH - 1].gameId - 1 : undefined,
+    };
   }
 
-  async post(updatePlayerDto: UpdatePlayerDto): Promise<PlayerAllRO> {
+  async post(updatePlayerDto: UpdatePlayerDto): Promise<PlayerDTO> {
     const { userNum, nickname } = updatePlayerDto;
     const lastGameId = await this.gameService.getLastGameId(userNum);
     await this.playerRepository.updatePlayer({

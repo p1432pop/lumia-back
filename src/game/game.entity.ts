@@ -1,4 +1,6 @@
+import { ArrayColumn, ObjectColumn } from 'src/shared/decorator/typeorm.decorator';
 import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { Equipment } from './dto/game.dto';
 
 @Entity('game')
 export class Game {
@@ -38,15 +40,15 @@ export class Game {
   @Column()
   bestWeaponLevel: number;
 
-  @Column({
+  @ObjectColumn({
     length: 100,
   })
-  masteryLevel: string;
+  masteryLevel: object;
 
-  @Column({
+  @ObjectColumn({
     length: 100,
   })
-  equipment: string;
+  equipment: Equipment;
 
   @Column({
     length: 30,
@@ -80,10 +82,10 @@ export class Game {
   @Column()
   damageFromMonster: number;
 
-  @Column({
+  @ObjectColumn({
     length: 80,
   })
-  killMonsters: string;
+  killMonsters: object;
 
   @Column()
   healAmount: number;
@@ -118,15 +120,11 @@ export class Game {
   @Column()
   traitFirstCore: number;
 
-  @Column({
-    length: 30,
-  })
-  traitFirstSub: string;
+  @ArrayColumn()
+  traitFirstSub: number[];
 
-  @Column({
-    length: 30,
-  })
-  traitSecondSub: string;
+  @ArrayColumn()
+  traitSecondSub: number[];
 
   @Column()
   escapeState: number;

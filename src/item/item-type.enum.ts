@@ -17,6 +17,38 @@ export enum ConsumableType {
   Beverage = 'Beverage',
   Food = 'Food',
 }
+
+export enum ArmorType {
+  Chest = 'Chest',
+  Head = 'Head',
+  Arm = 'Arm',
+  Leg = 'Leg',
+}
+export enum WeaponType {
+  OneHandSword = 'OneHandSword',
+  TwoHandSword = 'TwoHandSword',
+  Axe = 'Axe',
+  DualSword = 'DualSword',
+  Pistol = 'Pistol',
+  AssaultRifle = 'AssaultRifle',
+  SniperRifle = 'SniperRifle',
+  Rapier = 'Rapier',
+  Spear = 'Spear',
+  Hammer = 'Hammer',
+  Bat = 'Bat',
+  HighAngleFire = 'HighAngleFire',
+  DirectFire = 'DirectFire',
+  Bow = 'Bow',
+  CrossBow = 'CrossBow',
+  Glove = 'Glove',
+  Tonfa = 'Tonfa',
+  Guitar = 'Guitar',
+  Nunchaku = 'Nunchaku',
+  Whip = 'Whip',
+  Camera = 'Camera',
+  Arcana = 'Arcana',
+  VFArm = 'VFArm',
+}
 export enum WearableType {
   OneHandSword = 'OneHandSword',
   TwoHandSword = 'TwoHandSword',

@@ -3,7 +3,6 @@ import { RankRepository } from './rank.repository';
 import { AxiosService } from 'src/axios/axios.service';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
-import { RankRO } from './rank.interface';
 import { ConfigService } from '@nestjs/config';
 import { RankDTO } from './dto/rank.dto';
 

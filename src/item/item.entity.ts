@@ -1,5 +1,5 @@
 import { Column, Entity, PrimaryColumn } from 'typeorm';
-import { ConsumableType, ItemGrade, ItemType, WearableType } from './item-type.enum';
+import { ConsumableType, ItemGrade, ItemType, ArmorType, WeaponType, WearableType } from './item-type.enum';
 import { NumericColumn } from 'src/shared/decorator/typeorm.decorator';
 
 export abstract class Common {
@@ -41,7 +41,7 @@ export class ItemWearable extends Common {
   @Column({
     enum: WearableType,
   })
-  wearableType: WearableType;
+  wearableType: ArmorType | WeaponType;
 
   @Column()
   attackPower: number;

@@ -1,9 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { AxiosService } from 'src/axios/axios.service';
 import { ItemRepository } from './item.repository';
-import { ItemConsumable, ItemWearable } from './item.entity';
-import { ConsumableType, WearableType } from './item-type.enum';
-import { ItemsConsumableDTO, ItemsWearableDTO } from './dto/item.dto';
+import { ConsumableType, ArmorType, WeaponType } from './item-type.enum';
+import { ItemConsumableDTO, ItemWearableDTO } from './dto/item.dto';
 
 @Injectable()
 export class ItemService {
@@ -12,28 +11,28 @@ export class ItemService {
     private readonly itemRepository: ItemRepository,
   ) {}
 
-  async getAllItemArmor(): Promise<ItemsWearableDTO> {
-    return { items: await this.itemRepository.getAllItemArmor() };
+  async getAllItemArmor(): Promise<ItemWearableDTO[]> {
+    return await this.itemRepository.getAllItemArmor();
   }
 
-  async getAllItemWeapon(): Promise<ItemsWearableDTO> {
-    return { items: await this.itemRepository.getAllItemWeapon() };
+  async getAllItemWeapon(): Promise<ItemWearableDTO[]> {
+    return await this.itemRepository.getAllItemWeapon();
   }
 
-  async getItemArmor(wearableType: WearableType): Promise<ItemsWearableDTO> {
-    return { items: await this.itemRepository.getItemArmor(wearableType) };
+  async getItemArmor(armorType: ArmorType): Promise<ItemWearableDTO[]> {
+    return await this.itemRepository.getItemArmor(armorType);
   }
 
-  async getItemWeapon(wearableType: WearableType): Promise<ItemsWearableDTO> {
-    return { items: await this.itemRepository.getItemWeapon(wearableType) };
+  async getItemWeapon(weaponType: WeaponType): Promise<ItemWearableDTO[]> {
+    return await this.itemRepository.getItemWeapon(weaponType);
   }
 
-  async getAllItemConsumable(): Promise<ItemsConsumableDTO> {
-    return { items: await this.itemRepository.getAllItemConsumable() };
+  async getAllItemConsumable(): Promise<ItemConsumableDTO[]> {
+    return await this.itemRepository.getAllItemConsumable();
   }
 
-  async getItemConsumable(consumableType: ConsumableType): Promise<ItemsConsumableDTO> {
-    return { items: await this.itemRepository.getItemConsumable(consumableType) };
+  async getItemConsumable(consumableType: ConsumableType): Promise<ItemConsumableDTO[]> {
+    return await this.itemRepository.getItemConsumable(consumableType);
   }
 
   async updateItemConsumable(): Promise<void> {

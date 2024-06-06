@@ -1,12 +1,25 @@
-import { Type } from 'class-transformer';
-import { IsNumber } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
+import { IsInt, Max, Min } from 'class-validator';
 
 export class RankQueryDTO {
-  @IsNumber()
-  @Type(() => Number)
+  @ApiProperty({
+    example: 1,
+    description: '',
+    required: true,
+    type: 'number',
+  })
+  @IsInt()
+  @Min(1)
   seasonId: number;
 
-  @IsNumber()
-  @Type(() => Number)
+  @ApiProperty({
+    example: 1,
+    description: '',
+    required: true,
+    type: 'number',
+  })
+  @IsInt()
+  @Min(1)
+  @Max(10)
   page: number;
 }

@@ -1,8 +1,8 @@
 import { LessThanOrEqual, Repository } from 'typeorm';
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Game } from './game.entity';
-import { PlayerStatsRO } from 'src/player/player.interface';
+import { CharacterStats } from 'src/player/dto/player.dto';
 
 @Injectable()
 export class GameRepository {
@@ -12,7 +12,7 @@ export class GameRepository {
   ) {}
   /**해당 유저의 20개의 게임 데이터를 리턴 No offset */
   async getGamesByUserNum(userNum: number, next: number): Promise<Game[]> {
-    return await this.gameRepository.find({
+    const result = await this.gameRepository.find({
       order: {
         gameId: 'DESC',
       },
@@ -22,10 +22,12 @@ export class GameRepository {
       },
       take: 20,
     });
+    if (result.length > 0) return result;
+    throw new NotFoundException();
   }
   /**해당 게임에 참여한 모든 참가자의 데이터를 리턴 */
   async getGameByGameId(gameId: number): Promise<Game[]> {
-    return await this.gameRepository.find({
+    const result = await this.gameRepository.find({
       where: {
         gameId,
       },
@@ -33,6 +35,8 @@ export class GameRepository {
         gameRank: 'ASC',
       },
     });
+    if (result.length > 0) return result;
+    throw new NotFoundException();
   }
   async getTotalLastGameId(): Promise<number> {
     const result = await this.gameRepository.findOne({
@@ -61,7 +65,7 @@ export class GameRepository {
     if (result) return result.gameId;
     else return 0;
   }
-  async getUserStats(userNum: number): Promise<PlayerStatsRO[]> {
+  async getUserStats(userNum: number): Promise<CharacterStats[]> {
     return await this.gameRepository
       .createQueryBuilder('game')
       .select('game.characterNum', 'characterCode')
