@@ -16,7 +16,7 @@ export class NewsService {
   }
   async addNews(): Promise<void> {
     const { id } = await this.newsRepository.findOne();
-    const news = await this.axiosService.test();
+    const news = await this.axiosService.getNews();
     for (let article of news.articles) {
       if (article.category_id === this.CATEGORY_ID && article.i18ns.ko_KR.title.includes('패치노트')) {
         if (article.id <= id) return;

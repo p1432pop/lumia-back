@@ -11,6 +11,9 @@ export class Game {
   gameId: number;
 
   @Column()
+  seasonId: number;
+
+  @Column()
   versionMajor: number;
 
   @Column()

@@ -14,19 +14,22 @@ export class BatchService {
     private readonly itemService: ItemService,
     private readonly newsService: NewsService,
   ) {
-    this.currentSeasonId = parseInt(this.configService.get<string>('CURRENT_SEASON_ID') || '23');
+    this.currentSeasonId = parseInt(this.configService.get<string>('CURRENT_SEASON_ID') || '25');
   }
+
   @Cron('0 * * * *')
   updateRanking() {
     //this.rankService.updateRanking(this.currentSeasonId);
   }
 
-  @Cron('0 * * * *')
+  @Cron('0 18 * * *')
   updateItem() {
-    /* this.itemService.updateItemConsumable();
-    this.itemService.updateItemWearable(); */
+    this.itemService.updateItemConsumable();
+    this.itemService.updateItemWearable();
   }
 
-  @Cron('0 * * * *')
-  updateNews() {}
+  @Cron('0 15 * * *')
+  updateNews() {
+    this.newsService.addNews();
+  }
 }

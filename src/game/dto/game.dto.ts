@@ -59,6 +59,13 @@ export class GameDTO {
   gameId: number;
 
   @ApiProperty({
+    description: '시즌 ID',
+    type: 'integer',
+  })
+  @Expose()
+  seasonId: number;
+
+  @ApiProperty({
     description: '메인 수정 버전',
     type: 'integer',
   })

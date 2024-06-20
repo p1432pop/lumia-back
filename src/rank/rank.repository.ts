@@ -15,11 +15,11 @@ export class RankRepository {
   ) {}
   async getRanking(seasonId: number, page: number, count: number = 100): Promise<Ranking[]> {
     const result = await this.rankRepository.find({
+      where: { seasonId },
       order: {
         mmr: 'DESC',
         nickname: 'ASC',
       },
-      where: { seasonId },
       take: count,
       skip: (page - 1) * 100,
     });

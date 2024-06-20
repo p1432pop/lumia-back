@@ -38,7 +38,7 @@ export class AxiosService {
     const result = await this.axiosInstanceV2.get('/ItemConsumable');
     return result.data.data;
   }
-  async test(): Promise<news> {
+  async getNews(): Promise<news> {
     const result = await axios.get('https://playeternalreturn.com/api/v1/posts/news?page=1', {
       headers: {
         'Accept-Language': 'ko',
@@ -74,7 +74,7 @@ export class AxiosService {
         let res = await Promise.all(URIs.map((endpoint: string) => this.axiosInstance.get(endpoint)));
         let results: Game[] = [];
         res.forEach((item) => {
-          if (item.data.code === 200 && item.data.userGames[0].seasonId > 0) {
+          if (item.data.code === 200 && item.data.userGames[0].matchingTeamMode == 3) {
             item.data.userGames.forEach((user: Game) => {
               if (user.traitFirstSub.length !== 2 || user.traitSecondSub.length !== 2) {
                 user.traitFirstSub = [0, 0];
@@ -95,19 +95,17 @@ export class AxiosService {
   async getUserStatsByUserNums(userNums: number[], season: number): Promise<Ranking[]> {
     let URIs: string[] = userNums.map((userNum: number) => `/user/stats/${userNum}/${season}`);
     let results: Ranking[] = [];
-    let chunkedURIs = this.chunkArray(URIs, 20); // Split URIs into chunks of 20
+    let chunkedURIs = this.chunkArray(URIs, 20);
 
-    // Create an array to hold all promises
     for (let i = 0; i < chunkedURIs.length; i++) {
       let targetURIs = chunkedURIs[i];
-      console.log(new Date());
       let res = await Promise.all(targetURIs.map((endpoint: string) => this.axiosInstance.get(endpoint)));
       res.forEach((item) => {
         const { data } = item;
         const { userStats } = data;
         const userStat = userStats.pop();
         const { characterStats } = userStat;
-        const { userNum, seasonId, nickname, rank, mmr, totalGames, top1, top3, averageRank, averageKills } = userStat;
+        const { userNum, seasonId, nickname, mmr, totalGames, top1, top3, averageRank, averageKills } = userStat;
         const characterInfo = characterStats.slice(0, 3).map((charStat: { characterCode: number; totalGames: number }) => ({
           characterCode: charStat.characterCode,
           totalGames: charStat.totalGames,
@@ -131,8 +129,6 @@ export class AxiosService {
           charTotal3: character3?.totalGames,
         });
       });
-
-      // Add delay between chunks, except for the last chunk
       if (i < chunkedURIs.length - 1) {
         await new Promise((resolve) => setTimeout(resolve, 1000));
       }
@@ -140,8 +136,7 @@ export class AxiosService {
     return results;
   }
 
-  // Function to split an array into chunks
-  chunkArray(array: string[], size: number) {
+  chunkArray(array: string[], size: number): string[][] {
     let chunkedArray: Array<string>[] = [];
     for (let i: number = 0; i < array.length; i += size) {
       chunkedArray.push(array.slice(i, i + size));
@@ -149,7 +144,7 @@ export class AxiosService {
     return chunkedArray;
   }
 
-  async getGameByGameId(gameId: number): Promise<any> {
+  async getGameByGameId(gameId: number): Promise<Game[]> {
     const result = await this.axiosInstance.get(`/games/${gameId}`);
     return result.data;
   }
@@ -161,23 +156,8 @@ export class AxiosService {
     throw new NotFoundException();
   }
 
-  async getRankByUserNum(userNum: number, season: number): Promise<number> {
-    const result = await this.axiosInstance.get(`/rank/${userNum}/${season}/3`);
+  async getRankByUserNum(userNum: number, seasonId: number): Promise<number> {
+    const result = await this.axiosInstance.get(`/rank/${userNum}/${seasonId}/3`);
     return result.data.userRank.rank;
-  }
-
-  async getGamesByUserNum(userNum: number, next?: number): Promise<{ userGames: Array<any>; next: number }> {
-    let url = `/user/games/${userNum}`;
-    if (next) {
-      url += `?next=${next}`;
-    }
-    const result = await this.axiosInstance.get(url);
-    if (result.data.code === 200) {
-      return {
-        userGames: result.data.userGames,
-        next: result.data.next,
-      };
-    }
-    throw new NotFoundException();
   }
 }

@@ -29,7 +29,7 @@ import { ItemModule } from './item/item.module';
           password: configService.get<string>('DB_PASSWORD'),
           entities: [__dirname + '/**/*.entity{.ts,.js}'],
           synchronize: false,
-          logging: true,
+          logging: false,
         };
       },
     }),

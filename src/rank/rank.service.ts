@@ -15,7 +15,7 @@ export class RankService {
     private readonly configService: ConfigService,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {
-    this.seasonId = this.configService.get<number>('CURRENT_SEASON_ID') || 23;
+    this.seasonId = this.configService.get<number>('CURRENT_SEASON_ID') || 25;
   }
   async getMainRanking(): Promise<RankDTO> {
     const topRanks = await this.rankRepository.getRanking(this.seasonId, 1, 5);

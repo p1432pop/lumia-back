@@ -12,28 +12,21 @@ export class PlayerRepository {
   async getPlayerByUserNum(userNum: number): Promise<Player | null> {
     return await this.playerRepository.findOne({ where: { userNum } });
   }
-  async getUpdatedByUserNum(userNum: number) {
-    return await this.playerRepository.findOne({
+  async getUpdatedByUserNum(userNum: number): Promise<Date> {
+    const result = await this.playerRepository.findOne({
       select: { updated: true },
       where: { userNum },
     });
+    if (result) return result.updated;
+    throw new NotFoundException();
   }
-  async getLastGameIdByUserNum(userNum: number) {
-    return await this.playerRepository.findOne({
+  async getLastGameIdByUserNum(userNum: number): Promise<number> {
+    const result = await this.playerRepository.findOne({
       select: { lastGameId: true },
       where: { userNum },
     });
-  }
-  async create(player: Player): Promise<void> {
-    const dto = this.playerRepository.create(player);
-    this.playerRepository.save(dto);
-  }
-  async createPlayer(userNum: number, nickname: string) {
-    const dto = this.playerRepository.create({
-      userNum,
-      nickname,
-    });
-    this.playerRepository.save(dto);
+    if (result) return result.lastGameId;
+    throw new NotFoundException();
   }
   async updatePlayer(player: Player): Promise<Player> {
     return await this.playerRepository.save(player);

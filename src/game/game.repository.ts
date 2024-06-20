@@ -11,14 +11,15 @@ export class GameRepository {
     private readonly gameRepository: Repository<Game>,
   ) {}
   /**해당 유저의 20개의 게임 데이터를 리턴 No offset */
-  async getGamesByUserNum(userNum: number, next: number): Promise<Game[]> {
+  async getGamesByUserNum(userNum: number, seasonId: number, next: number): Promise<Game[]> {
     const result = await this.gameRepository.find({
-      order: {
-        gameId: 'DESC',
-      },
       where: {
         userNum,
         gameId: LessThanOrEqual(next),
+        seasonId,
+      },
+      order: {
+        gameId: 'DESC',
       },
       take: 20,
     });
@@ -43,6 +44,7 @@ export class GameRepository {
       select: {
         gameId: true,
       },
+      where: {},
       order: {
         gameId: 'DESC',
       },
@@ -55,17 +57,17 @@ export class GameRepository {
       select: {
         gameId: true,
       },
-      order: {
-        gameId: 'DESC',
-      },
       where: {
         userNum,
+      },
+      order: {
+        gameId: 'DESC',
       },
     });
     if (result) return result.gameId;
     else return 0;
   }
-  async getUserStats(userNum: number): Promise<CharacterStats[]> {
+  async getUserStats(userNum: number, seasonId: number): Promise<CharacterStats[]> {
     return await this.gameRepository
       .createQueryBuilder('game')
       .select('game.characterNum', 'characterCode')
@@ -78,7 +80,7 @@ export class GameRepository {
       .addSelect('ROUND(AVG(game.monsterKill), 2)', 'averageHunts')
       .addSelect('ROUND(AVG(game.gameRank), 2)', 'averageRank')
       .addSelect('CAST(AVG(game.totalGainVFCredit) AS INTEGER)', 'averageGainVFCredit')
-      .where({ userNum })
+      .where({ userNum, seasonId })
       .groupBy('game.characterNum')
       .orderBy('COUNT(*)', 'DESC')
       .getRawMany();

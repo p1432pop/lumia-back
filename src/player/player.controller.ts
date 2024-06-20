@@ -7,6 +7,7 @@ import { SerializeInterceptor } from 'src/shared/interceptor/serialize.intercept
 import { ApiBadRequestResponse, ApiCreatedResponse, ApiNotFoundResponse, ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { BadRequestDTO } from 'src/shared/dto/request/bad-request.dto';
 import { NotFoundDTO } from 'src/shared/dto/request/not-found.dto';
+import { FindPlayerDto } from './dto/find-player.dto';
 
 @ApiTags('Player')
 @Controller('player')
@@ -29,15 +30,11 @@ export class PlayerController {
   @ApiResponse({ status: 200, description: '200 response', type: PlayerPastDTO })
   @ApiBadRequestResponse({ description: '400 response', type: BadRequestDTO })
   @ApiNotFoundResponse({ description: '404 response', type: NotFoundDTO })
-  @ApiParam({ name: 'userNum', description: 'user number' })
-  @ApiQuery({ name: 'next', description: "paging parameter 'next' from previous response" })
-  @Get('past/:userNum')
+  @Get('past')
   @UseInterceptors(new SerializeInterceptor(PlayerPastDTO))
-  async getPastData(
-    @Param('userNum', ParseIntPipe) userNum: number,
-    @Query('next', new DefaultValuePipe(0), ParseIntPipe) next: number,
-  ): Promise<PlayerPastDTO> {
-    return await this.playerService.getPastData(userNum, next);
+  async getPastData(@Query() query: FindPlayerDto): Promise<PlayerPastDTO> {
+    const { userNum, seasonId, next } = query;
+    return await this.playerService.getPastData(userNum, seasonId, next);
   }
 
   @ApiOperation({ summary: 'update user data', description: 'update user data by userNum, nickname' })

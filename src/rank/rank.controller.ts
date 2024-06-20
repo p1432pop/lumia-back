@@ -1,4 +1,4 @@
-import { Controller, Get, ParseIntPipe, Query, UseInterceptors, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Controller, Get, Query, UseInterceptors } from '@nestjs/common';
 import { RankService } from './rank.service';
 import { CacheInterceptor } from '@nestjs/cache-manager';
 import { RankDTO } from './dto/rank.dto';

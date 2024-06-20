@@ -9,14 +9,15 @@ import { CharacterStats } from 'src/player/dto/player.dto';
 @Injectable()
 export class GameService implements OnModuleInit {
   private readonly RETRY_TIME: number = 30 * 60 * 1000;
-  private LAST_GAME_ID: number = 33658469;
+  private LAST_GAME_ID: number = 35259996;
   constructor(
     private readonly dataSource: DataSource,
     private readonly gameRepository: GameRepository,
     private readonly axiosService: AxiosService,
   ) {}
   async onModuleInit() {
-    //this.LAST_GAME_ID = await this.gameRepository.getTotalLastGameId()
+    this.LAST_GAME_ID = (await this.gameRepository.getTotalLastGameId()) + 1;
+    console.log(this.LAST_GAME_ID);
     // req.data.code === 200 or 404
     // 게임 중 한 팀이라도 끝난 경우 200, 그 외 404
     // 게임중이어도 끝나지 않았으면 404
@@ -54,9 +55,9 @@ export class GameService implements OnModuleInit {
         }
       }
     } */
-    /* while (true) {
+    while (true) {
       console.log(new Date());
-      let gameIds = [];
+      let gameIds: number[] = [];
       for (let i = 0; i < 45; i++) {
         gameIds.push(this.LAST_GAME_ID + i);
       }
@@ -64,19 +65,19 @@ export class GameService implements OnModuleInit {
       this.LAST_GAME_ID += 45;
       await this.insertGames(games);
       await new Promise((resolve) => setTimeout(resolve, 1000));
-    } */
+    }
   }
   async getFromAPI(gameId: number) {
     return await this.axiosService.getGameByGameId(gameId);
   }
-  async getFromDB(userNum: number, next: number): Promise<Game[]> {
-    return await this.gameRepository.getGamesByUserNum(userNum, next);
+  async getFromDB(userNum: number, seasonId: number, next: number): Promise<Game[]> {
+    return await this.gameRepository.getGamesByUserNum(userNum, seasonId, next);
   }
   async getGameByGameId(gameId: number): Promise<GameDTO[]> {
     return await this.gameRepository.getGameByGameId(gameId);
   }
-  async getUserStats(userNum: number): Promise<CharacterStats[]> {
-    return await this.gameRepository.getUserStats(userNum);
+  async getUserStats(userNum: number, seasonId: number): Promise<CharacterStats[]> {
+    return await this.gameRepository.getUserStats(userNum, seasonId);
   }
   async getLastGameId(userNum: number): Promise<number> {
     return await this.gameRepository.getPlayerLastGameId(userNum);
