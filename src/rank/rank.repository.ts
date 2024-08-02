@@ -1,8 +1,8 @@
 import { DataSource, Repository } from 'typeorm';
-import { Ranking } from './ranking.entity';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Ranking } from './entity/ranking.entity';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Updated } from './updated.entity';
+import { Updated } from './entity/updated.entity';
 
 @Injectable()
 export class RankRepository {
@@ -13,23 +13,30 @@ export class RankRepository {
     @InjectRepository(Updated)
     private readonly updatedRepository: Repository<Updated>,
   ) {}
-  async getRanking(seasonId: number, page: number, count: number = 100): Promise<Ranking[]> {
-    const result = await this.rankRepository.find({
-      where: { seasonId },
-      order: {
-        mmr: 'DESC',
-        nickname: 'ASC',
-      },
-      take: count,
-      skip: (page - 1) * 100,
-    });
-    if (result.length > 0) return result;
-    throw new NotFoundException();
-  }
-  async getUpdatedTime(seasonId: number): Promise<Updated> {
-    const result = await this.updatedRepository.findOne({ where: { seasonId } });
-    if (result) return result;
-    throw new NotFoundException();
+
+  async getRanking(seasonId: number, page: number, count: number = 100): Promise<Updated | null> {
+    // ------------------------------------------------------------------------------------------------
+    // Issue : Entity Mapping is not work with SubQueryFactory and Join
+    // https://github.com/typeorm/typeorm/issues/89
+    // https://stackoverflow.com/questions/78377752/how-to-limit-children-while-left-joining-in-typeorm
+    // https://stackoverflow.com/questions/66943353/limit-and-skip-related-column-in-typeorm
+    // ------------------------------------------------------------------------------------------------
+    const updated = await this.updatedRepository.findOne({ where: { seasonId } });
+    if (updated) {
+      updated.topRanks = await this.rankRepository.find({
+        where: { seasonId },
+        order: {
+          mmr: 'DESC',
+          nickname: 'ASC',
+        },
+        take: count,
+        skip: (page - 1) * 100,
+        relations: {
+          characterStats: true,
+        },
+      });
+    }
+    return updated;
   }
 
   async updateRanking(users: Ranking[], seasonId: number): Promise<void> {
@@ -37,9 +44,12 @@ export class RankRepository {
     await qr.connect();
     await qr.startTransaction();
     try {
-      await this.rankRepository.delete({ seasonId });
-      await this.rankRepository.insert(users);
-      await this.updatedRepository.save({ seasonId, updated: new Date() });
+      const updated = new Updated();
+      updated.seasonId = seasonId;
+      updated.topRanks = users;
+      updated.updated = new Date();
+      await this.updatedRepository.delete({ seasonId });
+      await this.updatedRepository.save(updated);
     } catch (e) {
       console.log(e);
       await qr.rollbackTransaction();

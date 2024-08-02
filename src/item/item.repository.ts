@@ -1,5 +1,5 @@
 import { DataSource, Repository } from 'typeorm';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ItemConsumable, ItemWearable } from './item.entity';
 import { ConsumableType, ItemType, WeaponType, ArmorType } from './item-type.enum';
@@ -14,84 +14,45 @@ export class ItemRepository {
     private readonly itemWearableRepository: Repository<ItemWearable>,
   ) {}
 
-  async getAllItemArmor(): Promise<ItemWearable[]> {
-    const result = await this.itemWearableRepository.find({
-      where: {
-        itemType: ItemType.Armor,
-      },
-      order: {
-        wearableType: 'ASC',
-        itemGrade: 'ASC',
-      },
-    });
-    if (result.length > 0) return result;
-    throw new NotFoundException();
+  async getItemArmor(armorType?: ArmorType): Promise<ItemWearable[]> {
+    const qb = this.itemWearableRepository.createQueryBuilder('item');
+
+    qb.where('item.itemType = :itemType', { itemType: ItemType.Armor });
+    if (armorType) {
+      qb.andWhere('item.wearableType = :armorType', { armorType });
+    }
+
+    qb.orderBy('item.wearableType', 'ASC');
+    qb.addOrderBy('item.itemGrade', 'ASC');
+
+    return await qb.getMany();
   }
 
-  async getAllItemWeapon(): Promise<ItemWearable[]> {
-    const result = await this.itemWearableRepository.find({
-      where: {
-        itemType: ItemType.Weapon,
-      },
-      order: {
-        wearableType: 'ASC',
-        itemGrade: 'ASC',
-      },
-    });
-    if (result.length > 0) return result;
-    throw new NotFoundException();
+  async getItemWeapon(weaponType?: WeaponType): Promise<ItemWearable[]> {
+    const qb = this.itemWearableRepository.createQueryBuilder('item');
+
+    qb.where('item.itemType = :itemType', { itemType: ItemType.Weapon });
+    if (weaponType) {
+      qb.andWhere('item.wearableType = :weaponType', { weaponType });
+    }
+
+    qb.orderBy('item.wearableType', 'ASC');
+    qb.addOrderBy('item.itemGrade', 'ASC');
+
+    return await qb.getMany();
   }
 
-  async getItemArmor(armorType: ArmorType): Promise<ItemWearable[]> {
-    const result = await this.itemWearableRepository.find({
-      where: {
-        itemType: ItemType.Armor,
-        wearableType: armorType,
-      },
-      order: {
-        itemGrade: 'ASC',
-      },
-    });
-    if (result.length > 0) return result;
-    throw new NotFoundException();
-  }
+  async getItemConsumable(consumableType?: ConsumableType): Promise<ItemConsumable[]> {
+    const qb = this.itemConsumableRepository.createQueryBuilder('item');
 
-  async getItemWeapon(weaponType: WeaponType): Promise<ItemWearable[]> {
-    const result = await this.itemWearableRepository.find({
-      where: {
-        itemType: ItemType.Weapon,
-        wearableType: weaponType,
-      },
-      order: {
-        itemGrade: 'ASC',
-      },
-    });
-    if (result.length > 0) return result;
-    throw new NotFoundException();
-  }
+    if (consumableType) {
+      qb.where('item.consumableType = :consumableType', { consumableType });
+    }
 
-  async getAllItemConsumable(): Promise<ItemConsumable[]> {
-    const result = await this.itemConsumableRepository.find({
-      order: {
-        consumableType: 'ASC',
-        itemGrade: 'ASC',
-      },
-    });
-    if (result.length > 0) return result;
-    throw new NotFoundException();
-  }
+    qb.orderBy('item.consumableType', 'ASC');
+    qb.addOrderBy('item.itemGrade', 'ASC');
 
-  async getItemConsumable(consumableType: ConsumableType): Promise<ItemConsumable[]> {
-    const result = await this.itemConsumableRepository.find({
-      where: {
-        consumableType,
-      },
-      order: {
-        itemGrade: 'ASC',
-      },
-    });
-    if (result.length > 0) return result;
-    throw new NotFoundException();
+    return await qb.getMany();
   }
 
   async updateItemConsumable(items: ItemConsumable[]): Promise<void> {

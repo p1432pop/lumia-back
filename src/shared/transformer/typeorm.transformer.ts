@@ -1,6 +1,6 @@
 import { ValueTransformer } from 'typeorm';
 
-export class ColumnNumericTransformer implements ValueTransformer {
+export class ParseFloatTransformer implements ValueTransformer {
   to(data: number): number {
     return data;
   }
@@ -9,7 +9,16 @@ export class ColumnNumericTransformer implements ValueTransformer {
   }
 }
 
-export class ColumnObjectTransformer implements ValueTransformer {
+export class ParseIntTransformer implements ValueTransformer {
+  to(data: number): number {
+    return data;
+  }
+  from(data: string): number {
+    return parseInt(data);
+  }
+}
+
+export class ParseObjectTransformer implements ValueTransformer {
   to(data: object): string {
     return JSON.stringify(data);
   }
@@ -18,7 +27,7 @@ export class ColumnObjectTransformer implements ValueTransformer {
   }
 }
 
-export class ColumnArrayTransformer implements ValueTransformer {
+export class ParseArrayTransformer implements ValueTransformer {
   to(data: number[]): string {
     return JSON.stringify(data);
   }

@@ -1,6 +1,24 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Expose, Type } from 'class-transformer';
 
+class CharacterStatDTO {
+  @ApiProperty({ description: '실험체의 번호', type: 'integer' })
+  @Expose()
+  characterCode: number;
+
+  @ApiProperty({ description: '플레이한 게임 수', type: 'integer' })
+  @Expose()
+  totalGames: number;
+
+  @ApiProperty({ description: '승리 횟수', type: 'integer' })
+  @Expose()
+  wins: number;
+
+  @ApiProperty({ description: 'top3 횟수', type: 'integer' })
+  @Expose()
+  top3: number;
+}
+
 class topRank {
   @ApiProperty({ description: '유저의 고유 번호', type: 'integer' })
   @Expose()
@@ -34,36 +52,14 @@ class topRank {
   @Expose()
   averageKills: number;
 
-  @ApiProperty({ description: '가장 많이 사용한 캐릭터의 번호', type: 'integer' })
+  @ApiProperty({ description: '가장 많이 사용한 캐릭터의 번호', type: CharacterStatDTO, isArray: true })
+  @Type(() => CharacterStatDTO)
   @Expose()
-  characterCode1: number;
-
-  @ApiProperty({ description: '가장 많이 사용한 캐릭터의 게임 수', type: 'integer' })
-  @Expose()
-  charTotal1: number;
-
-  @ApiProperty({ description: '두번째로 많이 사용한 캐릭터의 번호', type: 'integer' })
-  @Expose()
-  characterCode2?: number;
-
-  @ApiProperty({ description: '두번째로 많이 사용한 캐릭터의 게임 수', type: 'integer' })
-  @Expose()
-  charTotal2?: number;
-
-  @ApiProperty({ description: '세번째로 많이 사용한 캐릭터의 번호', type: 'integer' })
-  @Expose()
-  characterCode3?: number;
-
-  @ApiProperty({ description: '세번째로 많이 사용한 캐릭터의 게임 수', type: 'integer' })
-  @Expose()
-  charTotal3?: number;
+  characterStats: CharacterStatDTO[];
 }
 
 export class RankDTO {
-  @ApiProperty({
-    type: topRank,
-    isArray: true,
-  })
+  @ApiProperty({ type: topRank, isArray: true })
   @Type(() => topRank)
   @Expose()
   topRanks: topRank[];

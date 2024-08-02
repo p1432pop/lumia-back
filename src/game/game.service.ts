@@ -1,23 +1,26 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import { forwardRef, Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { GameRepository } from './game.repository';
 import { AxiosService } from 'src/axios/axios.service';
 import { Game } from './game.entity';
 import { DataSource } from 'typeorm';
 import { GameDTO } from './dto/game.dto';
-import { CharacterStats } from 'src/player/dto/player.dto';
+import { UserGamesQueryDTO } from 'src/user/dto/request/userGamesQuery.dto';
+import { User } from 'src/user/entity/user.entity';
+import { UserService } from 'src/user/user.service';
 
 @Injectable()
 export class GameService implements OnModuleInit {
   private readonly RETRY_TIME: number = 30 * 60 * 1000;
-  private LAST_GAME_ID: number = 35259996;
+  private LAST_GAME_ID: number;
   constructor(
     private readonly dataSource: DataSource,
     private readonly gameRepository: GameRepository,
     private readonly axiosService: AxiosService,
+    @Inject(forwardRef(() => UserService))
+    private readonly userService: UserService,
   ) {}
   async onModuleInit() {
-    this.LAST_GAME_ID = (await this.gameRepository.getTotalLastGameId()) + 1;
-    console.log(this.LAST_GAME_ID);
+    //this.interval();
     // req.data.code === 200 or 404
     // 게임 중 한 팀이라도 끝난 경우 200, 그 외 404
     // 게임중이어도 끝나지 않았으면 404
@@ -55,34 +58,68 @@ export class GameService implements OnModuleInit {
         }
       }
     } */
+  }
+  async interval() {
+    this.LAST_GAME_ID = (await this.gameRepository.getLastGameId()) + 1;
     while (true) {
-      console.log(new Date());
       let gameIds: number[] = [];
       for (let i = 0; i < 45; i++) {
         gameIds.push(this.LAST_GAME_ID + i);
       }
       let games = await this.axiosService.getGamesByGameIds(gameIds);
       this.LAST_GAME_ID += 45;
+      let users: User[] = [];
+      for (let i = 0; i < games.length; i++) {
+        let user = new User();
+        user.userNum = games[i].userNum;
+        user.nickname = games[i].nickname;
+        if (games[i].isRank) {
+          if (games[i].mmrGain === 0 && games[i].mmrAfter === 0) {
+            user.mmr = games[i].mmrBefore;
+          } else {
+            user.mmr = games[i].mmrAfter;
+          }
+        }
+        user.accountLevel = games[i].accountLevel;
+        users.push(user);
+      }
+      const userMap = new Map<number, User>();
+      for (const user of users) {
+        userMap.set(user.userNum, user);
+      }
+      const uniqueUsers = Array.from(userMap.values());
+      let start = new Date();
+      await this.userService.upsertUsers(uniqueUsers);
       await this.insertGames(games);
+      let end = new Date();
+      console.log(end.getTime() - start.getTime());
       await new Promise((resolve) => setTimeout(resolve, 1000));
     }
   }
   async getFromAPI(gameId: number) {
     return await this.axiosService.getGameByGameId(gameId);
   }
-  async getFromDB(userNum: number, seasonId: number, next: number): Promise<Game[]> {
-    return await this.gameRepository.getGamesByUserNum(userNum, seasonId, next);
+
+  async getUserGames(query: UserGamesQueryDTO): Promise<GameDTO[]> {
+    const games = await this.gameRepository.getUserGames(query);
+    const dto = games.map((game) => this.entityToDTO(game));
+    return dto;
   }
-  async getGameByGameId(gameId: number): Promise<GameDTO[]> {
-    return await this.gameRepository.getGameByGameId(gameId);
+
+  async getGame(gameId: number): Promise<GameDTO[]> {
+    const games = await this.gameRepository.getGame(gameId);
+    const dto = games.map((game) => this.entityToDTO(game));
+    return dto;
   }
-  async getUserStats(userNum: number, seasonId: number): Promise<CharacterStats[]> {
-    return await this.gameRepository.getUserStats(userNum, seasonId);
-  }
-  async getLastGameId(userNum: number): Promise<number> {
-    return await this.gameRepository.getPlayerLastGameId(userNum);
-  }
-  async insertGames(games): Promise<void> {
+
+  async insertGames(games: Game[]): Promise<void> {
     await this.gameRepository.insertGames(games);
+  }
+
+  private entityToDTO(game: Game): GameDTO {
+    return {
+      ...game,
+      nickname: game.user.nickname,
+    };
   }
 }

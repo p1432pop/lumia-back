@@ -1,9 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Cron } from '@nestjs/schedule';
+import { Cron, Interval } from '@nestjs/schedule';
+import { GameService } from 'src/game/game.service';
 import { ItemService } from 'src/item/item.service';
 import { NewsService } from 'src/news/news.service';
 import { RankService } from 'src/rank/rank.service';
+import { StatisticsService } from 'src/statistics/statistics.service';
 
 @Injectable()
 export class BatchService {
@@ -13,6 +15,8 @@ export class BatchService {
     private readonly rankService: RankService,
     private readonly itemService: ItemService,
     private readonly newsService: NewsService,
+    private readonly gameService: GameService,
+    private readonly statisticsService: StatisticsService,
   ) {
     this.currentSeasonId = parseInt(this.configService.get<string>('CURRENT_SEASON_ID') || '25');
   }
@@ -31,5 +35,10 @@ export class BatchService {
   @Cron('0 15 * * *')
   updateNews() {
     this.newsService.addNews();
+  }
+
+  @Cron('*/10 * * * *')
+  refreshGameStat() {
+    //this.statisticsService.refresh();
   }
 }

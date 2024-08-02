@@ -1,143 +1,104 @@
 import { ArrayColumn, ObjectColumn } from 'src/shared/decorator/typeorm.decorator';
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { Column, Entity, Index, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
 import { Equipment } from './dto/game.dto';
+import { User } from 'src/user/entity/user.entity';
 
 @Entity('game')
 export class Game {
-  @PrimaryColumn()
+  @PrimaryColumn({ type: 'integer' })
   userNum: number;
 
-  @PrimaryColumn()
+  /* Index order desc not supported in typeorm */
+  @Index('gameId_idx')
+  @PrimaryColumn({ type: 'integer' })
   gameId: number;
 
-  @Column()
-  seasonId: number;
-
-  @Column()
+  @PrimaryColumn({ type: 'integer' })
   versionMajor: number;
 
-  @Column()
+  @PrimaryColumn({ type: 'integer' })
   versionMinor: number;
 
-  @Column()
+  @Column({ type: 'boolean' })
+  isRank: boolean;
+
+  @Column({ type: 'smallint' })
   characterNum: number;
 
-  @Column()
+  @Column({ type: 'smallint' })
   characterLevel: number;
 
-  @Column()
+  @Column({ type: 'smallint' })
   gameRank: number;
 
-  @Column()
+  @Column({ type: 'smallint' })
   playerKill: number;
 
-  @Column()
+  @Column({ type: 'smallint' })
   playerAssistant: number;
 
-  @Column()
+  @Column({ type: 'smallint' })
   monsterKill: number;
 
-  @Column()
+  @Column({ type: 'smallint' })
   bestWeapon: number;
 
-  @Column()
-  bestWeaponLevel: number;
-
-  @ObjectColumn({
-    length: 100,
-  })
-  masteryLevel: object;
-
-  @ObjectColumn({
-    length: 100,
-  })
+  @ObjectColumn({ length: 100 })
   equipment: Equipment;
 
-  @Column({
-    length: 30,
-  })
-  startDtm: string;
+  @Column({ type: 'timestamptz' })
+  startDtm: Date;
 
-  @Column()
+  @Column({ type: 'smallint' })
   duration: number;
 
-  @Column()
-  mmrBefore: number;
+  @Column({ type: 'smallint', nullable: true })
+  mmrBefore: number | null;
 
-  @Column()
-  mmrGain: number;
+  @Column({ type: 'smallint', nullable: true })
+  mmrGain: number | null;
 
-  @Column()
-  mmrAfter: number;
+  @Column({ type: 'smallint', nullable: true })
+  mmrAfter: number | null;
 
-  @Column()
-  victory: number;
-
-  @Column()
+  @Column({ type: 'integer' })
   damageToPlayer: number;
 
-  @Column()
+  @Column({ type: 'integer' })
   damageFromPlayer: number;
 
-  @Column()
-  damageToMonster: number;
-
-  @Column()
-  damageFromMonster: number;
-
-  @ObjectColumn({
-    length: 80,
-  })
-  killMonsters: object;
-
-  @Column()
-  healAmount: number;
-
-  @Column()
-  teamRecover: number;
-
-  @Column()
-  addSurveillanceCamera: number;
-
-  @Column()
-  addTelephotoCamera: number;
-
-  @Column()
-  removeSurveillanceCamera: number;
-
-  @Column()
-  removeTelephotoCamera: number;
-
-  @Column()
-  giveUp: number;
-
-  @Column()
+  @Column({ type: 'smallint' })
   matchSize: number;
 
-  @Column()
+  @Column({ type: 'smallint' })
   teamKill: number;
 
-  @Column()
+  @Column({ type: 'smallint' })
   accountLevel: number;
 
-  @Column()
+  @Column({ type: 'integer' })
   traitFirstCore: number;
 
-  @ArrayColumn()
+  @ArrayColumn({ length: 30 })
   traitFirstSub: number[];
 
-  @ArrayColumn()
+  @ArrayColumn({ length: 30 })
   traitSecondSub: number[];
 
-  @Column()
+  @Column({ type: 'smallint' })
   escapeState: number;
 
-  @Column()
+  @Column({ type: 'smallint' })
   tacticalSkillGroup: number;
 
-  @Column()
+  @Column({ type: 'smallint' })
   tacticalSkillLevel: number;
 
-  @Column()
+  @Column({ type: 'smallint' })
   totalGainVFCredit: number;
+
+  //User entity will be inserted or updated automatically, when Game entity was inserted
+  @ManyToOne(() => User, { onDelete: 'CASCADE', cascade: ['insert', 'update'] })
+  @JoinColumn({ name: 'userNum', referencedColumnName: 'userNum' })
+  user: User;
 }

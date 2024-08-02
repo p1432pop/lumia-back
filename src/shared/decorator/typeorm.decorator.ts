@@ -1,29 +1,43 @@
-import { Column, ColumnOptions } from 'typeorm';
-import { ColumnArrayTransformer, ColumnNumericTransformer, ColumnObjectTransformer } from '../transformer/string-number.transformer';
+import { Column, ColumnOptions, ViewColumn } from 'typeorm';
+import { ParseArrayTransformer, ParseFloatTransformer, ParseIntTransformer, ParseObjectTransformer } from '../transformer/typeorm.transformer';
+import { ViewColumnOptions } from 'typeorm/decorator/options/ViewColumnOptions';
 
 export function NumericColumn(options?: ColumnOptions): PropertyDecorator {
   return Column({
     type: 'numeric',
-    precision: 5,
-    scale: 4,
-    transformer: new ColumnNumericTransformer(),
+    transformer: new ParseFloatTransformer(),
     ...options,
   });
 }
 
+/**type: varchar */
 export function ArrayColumn(options?: ColumnOptions): PropertyDecorator {
   return Column({
     type: 'varchar',
-    length: 30,
-    transformer: new ColumnArrayTransformer(),
+    transformer: new ParseArrayTransformer(),
     ...options,
   });
 }
 
+/**type: varchar */
 export function ObjectColumn(options?: ColumnOptions): PropertyDecorator {
   return Column({
     type: 'varchar',
-    transformer: new ColumnObjectTransformer(),
+    transformer: new ParseObjectTransformer(),
+    ...options,
+  });
+}
+
+export function IntViewColumn(options?: ViewColumnOptions): PropertyDecorator {
+  return ViewColumn({
+    transformer: new ParseIntTransformer(),
+    ...options,
+  });
+}
+
+export function NumericViewColumn(options?: ViewColumnOptions): PropertyDecorator {
+  return ViewColumn({
+    transformer: new ParseFloatTransformer(),
     ...options,
   });
 }

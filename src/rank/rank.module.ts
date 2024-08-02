@@ -2,13 +2,14 @@ import { Module } from '@nestjs/common';
 import { RankController } from './rank.controller';
 import { RankService } from './rank.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Ranking } from './ranking.entity';
+import { Ranking } from './entity/ranking.entity';
 import { RankRepository } from './rank.repository';
 import { AxiosModule } from 'src/axios/axios.module';
-import { Updated } from './updated.entity';
+import { Updated } from './entity/updated.entity';
+import { CharacterStat } from './entity/characterStat.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Ranking, Updated]), AxiosModule],
+  imports: [TypeOrmModule.forFeature([Ranking, Updated, CharacterStat]), AxiosModule],
   controllers: [RankController],
   providers: [RankService, RankRepository],
   exports: [RankService],

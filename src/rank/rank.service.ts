@@ -5,6 +5,7 @@ import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
 import { ConfigService } from '@nestjs/config';
 import { RankDTO } from './dto/rank.dto';
+import { RankQueryDTO } from './dto/rank-query.dto';
 
 @Injectable()
 export class RankService {
@@ -17,38 +18,45 @@ export class RankService {
   ) {
     this.seasonId = this.configService.get<number>('CURRENT_SEASON_ID') || 25;
   }
-  async getMainRanking(): Promise<RankDTO> {
-    const topRanks = await this.rankRepository.getRanking(this.seasonId, 1, 5);
-    const { updated } = await this.rankRepository.getUpdatedTime(this.seasonId);
-    return {
-      topRanks,
-      updated,
-    };
+
+  async getMainRanking(): Promise<RankDTO | null> {
+    const updated = await this.rankRepository.getRanking(this.seasonId, 1, 5);
+    return updated;
   }
-  async getRanking(seasonId: number, page: number): Promise<RankDTO> {
-    const key = seasonId.toString() + '_' + page.toString();
-    let value = await this.cacheManager.get<RankDTO>(key);
-    if (!value) {
-      const topRanks = await this.rankRepository.getRanking(seasonId, page);
-      const { updated } = await this.rankRepository.getUpdatedTime(seasonId);
-      value = {
-        topRanks,
-        updated,
-      };
-      await this.cacheManager.set(key, value);
+
+  async getRanking(query: RankQueryDTO): Promise<RankDTO | null> {
+    const { seasonId, page } = query;
+    const key = this.getCacheKey(seasonId, page);
+    const cachedRank = await this.cacheManager.get<RankDTO>(key);
+
+    // 캐시에 값이 있는 경우
+    if (cachedRank) return cachedRank;
+
+    const updated = await this.rankRepository.getRanking(seasonId, page);
+
+    if (updated) {
+      await this.cacheManager.set(key, updated);
+      return updated;
     }
-    return value;
+
+    return null;
   }
+
   async updateRanking(seasonId: number): Promise<void> {
     const result = await this.axiosService.getSeasonRanking(seasonId);
     await this.rankRepository.updateRanking(result, seasonId);
 
     // 캐시에 값이 있으면 삭제
     let keys: string[] = [];
-    for (let i = 1; i <= 10; i++) {
-      keys.push(seasonId.toString() + '_' + i.toString());
+    for (let page = 1; page <= 10; page++) {
+      keys.push(this.getCacheKey(seasonId, page));
     }
+    // main ranking key
     keys.push('/rank');
     await this.cacheManager.store.mdel(...keys);
+  }
+
+  private getCacheKey(seasonId: number, page: number): string {
+    return seasonId.toString() + '_' + page.toString();
   }
 }

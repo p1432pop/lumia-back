@@ -8,16 +8,17 @@ export function setup(app: INestApplication): void {
   SwaggerModule.setup('api', app, document);
   app.useGlobalPipes(
     new ValidationPipe({
+      whitelist: true,
       transform: true,
       transformOptions: {
         enableImplicitConversion: true,
       },
     }),
   );
-  app.useGlobalInterceptors(
+  /* app.useGlobalInterceptors(
     new ClassSerializerInterceptor(app.get(Reflector), {
       strategy: 'excludeAll',
       excludeExtraneousValues: true,
     }),
-  );
+  ); */
 }

@@ -1,13 +1,14 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { GameController } from './game.controller';
 import { GameService } from './game.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Game } from './game.entity';
 import { GameRepository } from './game.repository';
 import { AxiosModule } from 'src/axios/axios.module';
+import { UserModule } from 'src/user/user.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Game]), AxiosModule],
+  imports: [TypeOrmModule.forFeature([Game]), AxiosModule, forwardRef(() => UserModule)],
   controllers: [GameController],
   providers: [GameService, GameRepository],
   exports: [GameService],

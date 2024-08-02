@@ -1,5 +1,5 @@
 import { Repository } from 'typeorm';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { News } from './news.entity';
 
@@ -9,27 +9,26 @@ export class NewsRepository {
     @InjectRepository(News)
     private readonly newsRepository: Repository<News>,
   ) {}
+
   async findAll(): Promise<News[]> {
-    const result = await this.newsRepository.find({
+    return await this.newsRepository.find({
       order: {
         id: 'DESC',
       },
       take: 4,
     });
-    if (result) return result;
-    throw new NotFoundException();
   }
-  async findOne(): Promise<News> {
-    const result = await this.newsRepository.findOne({
+
+  async findOne(): Promise<News | null> {
+    return await this.newsRepository.findOne({
+      where: {},
       order: {
         id: 'DESC',
       },
-      where: {},
     });
-    if (result) return result;
-    throw new NotFoundException();
   }
-  async updateNews(news: News): Promise<void> {
+
+  async addNews(news: News): Promise<void> {
     await this.newsRepository.save(news);
   }
 }
