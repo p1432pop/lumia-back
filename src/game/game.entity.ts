@@ -3,6 +3,8 @@ import { Column, Entity, Index, JoinColumn, ManyToOne, PrimaryColumn } from 'typ
 import { Equipment } from './dto/game.dto';
 import { User } from 'src/user/entity/user.entity';
 
+// TODO
+// Auto Partitioning
 @Entity('game')
 export class Game {
   @PrimaryColumn({ type: 'integer' })

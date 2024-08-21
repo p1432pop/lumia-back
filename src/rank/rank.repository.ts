@@ -48,10 +48,10 @@ export class RankRepository {
       updated.seasonId = seasonId;
       updated.topRanks = users;
       updated.updated = new Date();
-      await this.updatedRepository.delete({ seasonId });
-      await this.updatedRepository.save(updated);
+      await qr.manager.getRepository(Updated).delete({ seasonId });
+      await qr.manager.getRepository(Updated).save(updated);
+      await qr.commitTransaction();
     } catch (e) {
-      console.log(e);
       await qr.rollbackTransaction();
     } finally {
       await qr.release();

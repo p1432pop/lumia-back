@@ -8,11 +8,17 @@ import { SerializeInterceptor } from 'src/shared/interceptor/serialize.intercept
 import { ApiBadRequestResponse, ApiNotFoundResponse, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { BadRequestDTO } from 'src/shared/dto/request/bad-request.dto';
 import { NotFoundDTO } from 'src/shared/dto/request/not-found.dto';
+import { AppLogger } from 'src/shared/logger/logger.service';
 
 @ApiTags('Item')
 @Controller('item')
 export class ItemController {
-  constructor(private readonly itemService: ItemService) {}
+  constructor(
+    private readonly itemService: ItemService,
+    private readonly logger: AppLogger,
+  ) {
+    this.logger.setContext(ItemController.name);
+  }
 
   @ApiOperation({ summary: 'fetch consumable items', description: 'fetch consumable items by consumable type' })
   @ApiResponse({ status: 200, description: '200 response', type: ItemConsumableDTO, isArray: true })
@@ -23,7 +29,11 @@ export class ItemController {
   async getItemConsumable(@Query() query: ConsumableTypeDTO): Promise<ItemConsumableDTO[]> {
     const { consumableType } = query;
     const items = await this.itemService.getItemConsumable(consumableType);
-    if (items.length > 0) return items;
+    if (items.length > 0) {
+      this.logger.log(`${this.getItemConsumable.name} was called successfully`);
+      return items;
+    }
+    this.logger.error('ItemConsumable is empty');
     throw new NotFoundException();
   }
 
@@ -36,7 +46,11 @@ export class ItemController {
   async getItemArmor(@Query() query: ArmorTypeDTO): Promise<ItemWearableDTO[]> {
     const { armorType } = query;
     const items = await this.itemService.getItemArmor(armorType);
-    if (items.length > 0) return items;
+    if (items.length > 0) {
+      this.logger.log(`${this.getItemArmor.name} was called successfully`);
+      return items;
+    }
+    this.logger.error('ItemArmor is empty');
     throw new NotFoundException();
   }
 
@@ -49,7 +63,11 @@ export class ItemController {
   async getItemWeapon(@Query() query: WeaponTypeDTO): Promise<ItemWearableDTO[]> {
     const { weaponType } = query;
     const items = await this.itemService.getItemWeapon(weaponType);
-    if (items.length > 0) return items;
+    if (items.length > 0) {
+      this.logger.log(`${this.getItemWeapon.name} was called successfully`);
+      return items;
+    }
+    this.logger.error('ItemWeapon is empty');
     throw new NotFoundException();
   }
 }

@@ -14,8 +14,6 @@ export abstract class Common {
 
   @Column({ type: 'enum', enum: ItemGrade })
   itemGrade: ItemGrade;
-
-  modeType: number;
 }
 
 @Entity('item_consumable')

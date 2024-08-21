@@ -3,8 +3,9 @@ import { AxiosService } from 'src/axios/axios.service';
 import { ItemRepository } from './item.repository';
 import { ConsumableType, ArmorType, WeaponType } from './item-type.enum';
 import { ItemConsumableDTO, ItemWearableDTO } from './dto/item.dto';
-import { ItemWearable } from './item.entity';
-import { ItemArmorAPI, ItemConsumableAPI, ItemWeaponAPI } from 'src/axios/open-api/item.interface';
+import { ItemConsumable, ItemWearable } from './item.entity';
+import { ItemWeaponVO, ItemArmorVO, ItemConsumableVO } from 'src/axios/open-api/vo/item.vo';
+import { AppLogger } from 'src/shared/logger/logger.service';
 import { plainToInstance } from 'class-transformer';
 
 @Injectable()
@@ -12,7 +13,10 @@ export class ItemService {
   constructor(
     private readonly axiosService: AxiosService,
     private readonly itemRepository: ItemRepository,
-  ) {}
+    private readonly logger: AppLogger,
+  ) {
+    this.logger.setContext(ItemService.name);
+  }
 
   async getItemArmor(armorType?: ArmorType): Promise<ItemWearableDTO[]> {
     return await this.itemRepository.getItemArmor(armorType);
@@ -27,53 +31,65 @@ export class ItemService {
   }
 
   async updateItemConsumable(): Promise<void> {
-    const itemConsumable = await this.axiosService.getItemConsumable();
-    const filteredItemConsumable = itemConsumable.filter((item) => {
-      return item.modeType === 0 && item.consumableType in ConsumableType;
-    });
-    await this.itemRepository.updateItemConsumable(filteredItemConsumable);
+    const itemConsumableResponse = await this.axiosService.getItemConsumable();
+    if (!itemConsumableResponse || !itemConsumableResponse.data) {
+      this.logger.error('Failed to fetch ItemConsumable');
+      return;
+    }
+    const itemConsumable = itemConsumableResponse.data.filter((item) => this.isValidItemConsumable(item));
+    const itemConsumableEntity = itemConsumable.map((item) => this.itemConsumableToEntity(item));
+    await this.itemRepository.updateItemConsumable(itemConsumableEntity);
   }
 
-  async updateItemWearable(): Promise<void> {
+  async updateItemWeapon(): Promise<void> {
     const itemWeaponResponse = await this.axiosService.getItemWeapon();
-    if (!itemWeaponResponse) return;
-    const itemWeapon = itemWeaponResponse.data.filter((item) => this.isValidItemWearable(item));
-    const filteredItemWeapon = itemWeapon.filter((item) => {
-      /* item.wearableType = item.weaponType;
-      item.maxSp = item.maxSP; */
-      return this.isValidItemWearable(item);
-    });
-    const itemArmorResponse = await this.axiosService.getItemArmor();
-    if (!itemArmorResponse) return;
-
-    const filteredItemArmor = itemArmor.filter((item) => {
-      /* item.wearableType = item.armorType; */
-      return this.isValidItemWearable(item);
-    });
-    const items = [...filteredItemWeapon, ...filteredItemArmor];
-    await this.itemRepository.updateItemWearable(items);
+    if (!itemWeaponResponse || !itemWeaponResponse.data) {
+      this.logger.error('Failed to fetch ItemWeapon');
+      return;
+    }
+    const itemWeapon = itemWeaponResponse.data.filter((item) => this.isValidItemWeapon(item));
+    const itemWeaponEntity = itemWeapon.map((item) => this.itemWeaponToEntity(item));
+    await this.itemRepository.updateItemWeapon(itemWeaponEntity);
   }
 
-  private isValidItemWearable(item: ItemWeaponAPI | ItemArmorAPI): boolean {
+  async updateItemArmor(): Promise<void> {
+    const itemArmorResponse = await this.axiosService.getItemArmor();
+    if (!itemArmorResponse || !itemArmorResponse.data) {
+      this.logger.error('Failed to fetch ItemArmor');
+      return;
+    }
+    const itemArmor = itemArmorResponse.data.filter((item) => this.isValidItemArmor(item));
+    const itemArmorEntity = itemArmor.map((item) => this.itemArmorToEntity(item));
+    await this.itemRepository.updateItemArmor(itemArmorEntity);
+  }
+
+  private isValidItemWeapon(item: ItemWeaponVO): boolean {
     return item.modeType === 0 && !item.name.includes('패시브');
   }
 
-  private isValidItemConsumable(item: ItemConsumableAPI): boolean {
+  private isValidItemArmor(item: ItemArmorVO): boolean {
+    return item.modeType === 0 && !item.name.includes('패시브');
+  }
+
+  private isValidItemConsumable(item: ItemConsumableVO): boolean {
     return item.modeType === 0 && item.consumableType in ConsumableType;
   }
 
-  private itemWeaponToEntity(item: ItemWeaponAPI): ItemWearable {
-    return {
-      ...item,
-      wearableType: item.weaponType,
-      maxSp: item.maxSP,
-    };
+  private itemWeaponToEntity(item: ItemWeaponVO): ItemWearable {
+    const entity = plainToInstance(ItemWearable, item);
+    entity.wearableType = item.weaponType;
+    entity.maxSp = item.maxSP;
+    return entity;
   }
 
-  private itemArmorToEntity(item: ItemArmorAPI): ItemWearable {
-    return {
-      ...item,
-      wearableType: item.armorType,
-    };
+  private itemArmorToEntity(item: ItemArmorVO): ItemWearable {
+    const entity = plainToInstance(ItemWearable, item);
+    entity.wearableType = item.armorType;
+    return entity;
+  }
+
+  private itemConsumableToEntity(item: ItemConsumableVO): ItemConsumable {
+    const entity = plainToInstance(ItemConsumable, item);
+    return entity;
   }
 }

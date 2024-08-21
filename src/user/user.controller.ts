@@ -57,7 +57,7 @@ export class UserController {
   @Post()
   @UseInterceptors(new SerializeInterceptor(UserResponseDTO))
   async updateUser(@Body() updateUserDto: UpdateUserDTO): Promise<UserResponseDTO> {
-    const updatedUser = await this.userService.post(updateUserDto);
+    const updatedUser = await this.userService.updateUser(updateUserDto);
     if (updatedUser) return { code: 200, user: updatedUser };
     return { code: 404 };
   }

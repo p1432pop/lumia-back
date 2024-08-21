@@ -6,9 +6,10 @@ import { Game } from './game.entity';
 import { GameRepository } from './game.repository';
 import { AxiosModule } from 'src/axios/axios.module';
 import { UserModule } from 'src/user/user.module';
+import { AppLoggerModule } from 'src/shared/logger/logger.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Game]), AxiosModule, forwardRef(() => UserModule)],
+  imports: [TypeOrmModule.forFeature([Game]), AxiosModule, forwardRef(() => UserModule), AppLoggerModule],
   controllers: [GameController],
   providers: [GameService, GameRepository],
   exports: [GameService],

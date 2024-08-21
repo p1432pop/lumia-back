@@ -28,7 +28,7 @@ export class NewsRepository {
     });
   }
 
-  async addNews(news: News): Promise<void> {
-    await this.newsRepository.save(news);
+  async addNews(news: News): Promise<News> {
+    return await this.newsRepository.save(news);
   }
 }

@@ -5,9 +5,10 @@ import { AxiosModule } from 'src/axios/axios.module';
 import { News } from './news.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { NewsRepository } from './news.repository';
+import { AppLoggerModule } from 'src/shared/logger/logger.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([News]), AxiosModule],
+  imports: [TypeOrmModule.forFeature([News]), AxiosModule, AppLoggerModule],
   controllers: [NewsController],
   providers: [NewsService, NewsRepository],
   exports: [NewsService],

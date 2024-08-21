@@ -1,4 +1,4 @@
-import { Repository } from 'typeorm';
+import { QueryRunner, Repository } from 'typeorm';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entity/user.entity';
@@ -62,7 +62,21 @@ export class UserRepository {
     return await this.userRepository.save(user);
   }
 
-  async upsertUsers(users: User[]): Promise<void> {
-    await this.userRepository.upsert(users, ['userNum']);
+  async upsertUser(user: User | User[], qr?: QueryRunner): Promise<void> {
+    const qb = qr ? qr.manager.getRepository(User).createQueryBuilder() : this.userRepository.createQueryBuilder();
+
+    await qb
+      .insert()
+      .into(User)
+      .values(user)
+      .onConflict(
+        `
+        ("userNum") do update set 
+        "nickname" = excluded."nickname", 
+        "mmr" = COALESCE(excluded."mmr", "user"."mmr"),
+        "accountLevel" = excluded."accountLevel"
+        `,
+      )
+      .execute();
   }
 }

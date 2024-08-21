@@ -1,143 +1,294 @@
-import { BaseResponse } from './baseResponse.interface';
 import { ArmorType, ConsumableType, ItemGrade, ItemType, WeaponType } from 'src/item/item-type.enum';
+import { Exclude, Expose } from 'class-transformer';
+export class ItemConsumableVO {
+  @Expose()
+  code: number;
 
-export interface ItemWeaponResponse extends BaseResponse {
-  data: ItemWeaponAPI[];
+  @Expose()
+  name: string;
+
+  @Expose()
+  modeType: number;
+
+  @Expose()
+  itemType: ItemType;
+
+  @Expose()
+  consumableType: ConsumableType;
+
+  @Expose()
+  itemGrade: ItemGrade;
+
+  @Exclude()
+  makeMaterial1: number;
+
+  @Exclude()
+  makeMaterial2: number;
+
+  @Expose()
+  hpRecover: number;
+
+  @Expose()
+  spRecover: number;
 }
 
-export interface ItemArmorResponse extends BaseResponse {
-  data: ItemArmorAPI[];
+export class ItemCommonVO {
+  @Expose()
+  code: number;
+
+  @Expose()
+  name: string;
+
+  @Expose()
+  modeType: number;
+
+  @Expose()
+  itemType: ItemType;
+
+  @Expose()
+  itemGrade: ItemGrade;
+
+  @Expose()
+  isCompletedItem: boolean;
+
+  @Expose()
+  alertInSpectator: boolean;
+
+  @Expose()
+  markingType: string;
+
+  @Expose()
+  craftAnimTrigger: string;
+
+  @Expose()
+  stackable: number;
+
+  @Expose()
+  initialCount: number;
+
+  @Expose()
+  itemUsableType: string;
+
+  @Expose()
+  itemUsableValueList: number;
+
+  @Expose()
+  exclusiveProducer: number;
+
+  @Expose()
+  isRemovedFromPlayerCorpseInventoryWhenPlayerKilled: boolean;
+
+  @Expose()
+  makeMaterial1: number;
+
+  @Expose()
+  makeMaterial2: number;
+
+  @Expose()
+  makeCustomAction: string;
+
+  @Expose()
+  notDisarm: boolean;
+
+  @Expose()
+  manufacturableType: number;
+
+  @Expose()
+  attackPower: number;
+
+  @Expose()
+  attackPowerByLv: number;
+
+  @Expose()
+  defense: number;
+
+  @Expose()
+  defenseByLv: number;
+
+  @Expose()
+  skillAmp: number;
+
+  @Expose()
+  skillAmpByLevel: number;
+
+  @Expose()
+  skillAmpRatio: number;
+
+  @Expose()
+  skillAmpRatioByLevel: number;
+
+  @Expose()
+  adaptiveForce: number;
+
+  @Expose()
+  adaptiveForceByLevel: number;
+
+  @Expose()
+  maxHp: number;
+
+  @Expose()
+  maxHpByLv: number;
+
+  @Expose()
+  hpRegenRatio: number;
+
+  @Expose()
+  hpRegen: number;
+
+  @Expose()
+  spRegenRatio: number;
+
+  @Expose()
+  spRegen: number;
+
+  @Expose()
+  attackSpeedRatio: number;
+
+  @Expose()
+  attackSpeedRatioByLv: number;
+
+  @Expose()
+  criticalStrikeChance: number;
+
+  @Expose()
+  criticalStrikeDamage: number;
+
+  @Expose()
+  cooldownReduction: number;
+
+  @Expose()
+  preventCriticalStrikeDamaged: number;
+
+  @Expose()
+  cooldownLimit: number;
+
+  @Expose()
+  lifeSteal: number;
+
+  @Expose()
+  normalLifeSteal: number;
+
+  @Expose()
+  skillLifeSteal: number;
+
+  @Expose()
+  moveSpeed: number;
+
+  @Expose()
+  moveSpeedOutOfCombat: number;
+
+  @Expose()
+  sightRange: number;
+
+  @Expose()
+  attackRange: number;
+
+  @Expose()
+  increaseBasicAttackDamage: number;
+
+  @Expose()
+  increaseBasicAttackDamageByLv: number;
+
+  @Expose()
+  increaseBasicAttackDamageRatio: number;
+
+  @Expose()
+  increaseBasicAttackDamageRatioByLv: number;
+
+  @Expose()
+  preventBasicAttackDamaged: number;
+
+  @Expose()
+  preventBasicAttackDamagedByLv: number;
+
+  @Expose()
+  preventBasicAttackDamagedRatio: number;
+
+  @Expose()
+  preventBasicAttackDamagedRatioByLv: number;
+
+  @Expose()
+  preventSkillDamaged: number;
+
+  @Expose()
+  preventSkillDamagedByLv: number;
+
+  @Expose()
+  preventSkillDamagedRatio: number;
+
+  @Expose()
+  preventSkillDamagedRatioByLv: number;
+
+  @Expose()
+  penetrationDefense: number;
+
+  @Expose()
+  penetrationDefenseRatio: number;
+
+  @Expose()
+  trapDamageReduce: number;
+
+  @Expose()
+  trapDamageReduceRatio: number;
+
+  @Expose()
+  hpHealedIncreaseRatio: number;
+
+  @Expose()
+  healerGiveHpHealRatio: number;
+
+  @Expose()
+  uniqueAttackRange: number;
+
+  @Expose()
+  uniqueHpHealedIncreaseRatio: number;
+
+  @Expose()
+  uniqueCooldownLimit: number;
+
+  @Expose()
+  uniqueTenacity: number;
+
+  @Expose()
+  uniqueMoveSpeed: number;
+
+  @Expose()
+  uniquePenetrationDefense: number;
+
+  @Expose()
+  uniquePenetrationDefenseRatio: number;
+
+  @Expose()
+  uniqueLifeSteal: number;
+
+  @Expose()
+  uniqueSkillAmpRatio: number;
+
+  @Expose()
+  restoreItemWhenResurrected: boolean;
+
+  @Expose()
+  creditValueWhenConvertedToBounty: number;
 }
 
-export interface ItemConsumableResponse extends BaseResponse {
-  data: ItemConsumableAPI[];
-}
-
-export interface ItemWeaponAPI extends ItemCommonAPI {
+export class ItemWeaponVO extends ItemCommonVO {
+  @Expose()
   gradeBgOverride: string;
+
+  @Expose()
   weaponType: WeaponType;
+
+  @Expose()
   consumable: boolean;
+
+  @Expose()
   maxSP: number;
 }
 
-export interface ItemArmorAPI extends ItemCommonAPI {
+export class ItemArmorVO extends ItemCommonVO {
+  @Expose()
   armorType: ArmorType;
+
+  @Expose()
   maxSp: number;
-}
-
-export interface ItemConsumableAPI {
-  code: number;
-  name: string;
-  modeType: number;
-  itemType: ItemType;
-  consumableType: ConsumableType;
-  consumableTag: string;
-  itemGrade: ItemGrade;
-  isCompletedItem: boolean;
-  alertInSpectator: boolean;
-  markingType: string;
-  craftAnimTrigger: string;
-  stackable: number;
-  initialCount: number;
-  itemUsableType: string;
-  itemUsableValueList: number;
-  exclusiveProducer: number;
-  isRemovedFromPlayerCorpseInventoryWhenPlayerKilled: boolean;
-  manufacturableType: number;
-  makeMaterial1: number;
-  makeMaterial2: number;
-  heal: number;
-  hpRecover: number;
-  spRecover: number;
-  attackPowerByBuff: number;
-  defenseByBuff: number;
-  skillAmpByBuff: number;
-  skillAmpRatioByBuff: number;
-  addStateCode: number;
-  isVPadQuickSlotItem: boolean;
-  restoreItemWhenResurrected: boolean;
-  creditValueWhenConvertedToBounty: number;
-  isReduceLootOnDeath: boolean;
-}
-
-export interface ItemCommonAPI {
-  code: number;
-  name: string;
-  modeType: number;
-  itemType: ItemType;
-  itemGrade: ItemGrade;
-  isCompletedItem: boolean;
-  alertInSpectator: boolean;
-  markingType: string;
-  craftAnimTrigger: string;
-  stackable: number;
-  initialCount: number;
-  itemUsableType: string;
-  itemUsableValueList: number;
-  exclusiveProducer: number;
-  isRemovedFromPlayerCorpseInventoryWhenPlayerKilled: boolean;
-  makeMaterial1: number;
-  makeMaterial2: number;
-  makeCustomAction: string;
-  notDisarm: boolean;
-  manufacturableType: number;
-  attackPower: number;
-  attackPowerByLv: number;
-  defense: number;
-  defenseByLv: number;
-  skillAmp: number;
-  skillAmpByLevel: number;
-  skillAmpRatio: number;
-  skillAmpRatioByLevel: number;
-  adaptiveForce: number;
-  adaptiveForceByLevel: number;
-  maxHp: number;
-  maxHpByLv: number;
-  hpRegenRatio: number;
-  hpRegen: number;
-  spRegenRatio: number;
-  spRegen: number;
-  attackSpeedRatio: number;
-  attackSpeedRatioByLv: number;
-  criticalStrikeChance: number;
-  criticalStrikeDamage: number;
-  cooldownReduction: number;
-  preventCriticalStrikeDamaged: number;
-  cooldownLimit: number;
-  lifeSteal: number;
-  normalLifeSteal: number;
-  skillLifeSteal: number;
-  moveSpeed: number;
-  moveSpeedOutOfCombat: number;
-  sightRange: number;
-  attackRange: number;
-  increaseBasicAttackDamage: number;
-  increaseBasicAttackDamageByLv: number;
-  increaseBasicAttackDamageRatio: number;
-  increaseBasicAttackDamageRatioByLv: number;
-  preventBasicAttackDamaged: number;
-  preventBasicAttackDamagedByLv: number;
-  preventBasicAttackDamagedRatio: number;
-  preventBasicAttackDamagedRatioByLv: number;
-  preventSkillDamaged: number;
-  preventSkillDamagedByLv: number;
-  preventSkillDamagedRatio: number;
-  preventSkillDamagedRatioByLv: number;
-  penetrationDefense: number;
-  penetrationDefenseRatio: number;
-  trapDamageReduce: number;
-  trapDamageReduceRatio: number;
-  hpHealedIncreaseRatio: number;
-  healerGiveHpHealRatio: number;
-  uniqueAttackRange: number;
-  uniqueHpHealedIncreaseRatio: number;
-  uniqueCooldownLimit: number;
-  uniqueTenacity: number;
-  uniqueMoveSpeed: number;
-  uniquePenetrationDefense: number;
-  uniquePenetrationDefenseRatio: number;
-  uniqueLifeSteal: number;
-  uniqueSkillAmpRatio: number;
-  restoreItemWhenResurrected: boolean;
-  creditValueWhenConvertedToBounty: number;
 }

@@ -15,23 +15,12 @@ export class StatisticsRepository {
   ) {}
 
   async refresh(): Promise<void> {
-    try {
-      await this.versionStatRepository.query('REFRESH MATERIALIZED VIEW CONCURRENTLY game_mat_view');
-      console.log('refresh success', new Date());
-    } catch (e) {
-      console.log(e, new Date());
-    }
+    await this.versionStatRepository.query('REFRESH MATERIALIZED VIEW CONCURRENTLY game_mat_view');
   }
 
   async getVersionStat(query: VersionStatQueryDTO): Promise<VersionStat[]> {
-    const { versionMajor, versionMinor, tier, isRank } = query;
     return await this.versionStatRepository.find({
-      where: {
-        versionMajor,
-        versionMinor,
-        tier,
-        isRank,
-      },
+      where: query,
       order: { totalGames: 'DESC' },
     });
   }

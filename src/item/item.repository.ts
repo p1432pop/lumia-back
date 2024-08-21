@@ -60,25 +60,37 @@ export class ItemRepository {
     await qr.connect();
     await qr.startTransaction();
     try {
-      await this.itemConsumableRepository.delete({});
-      await this.itemConsumableRepository.insert(items);
+      await qr.manager.getRepository(ItemConsumable).delete({});
+      await qr.manager.getRepository(ItemConsumable).insert(items);
     } catch (e) {
-      console.log(e);
       await qr.rollbackTransaction();
     } finally {
       await qr.release();
     }
   }
 
-  async updateItemWearable(items: ItemWearable[]): Promise<void> {
+  async updateItemWeapon(items: ItemWearable[]): Promise<void> {
     const qr = this.datasource.createQueryRunner();
     await qr.connect();
     await qr.startTransaction();
     try {
-      await this.itemWearableRepository.delete({});
-      await this.itemWearableRepository.insert(items);
+      await qr.manager.getRepository(ItemWearable).delete({ itemType: ItemType.Weapon });
+      await qr.manager.getRepository(ItemWearable).insert(items);
     } catch (e) {
-      console.log(e);
+      await qr.rollbackTransaction();
+    } finally {
+      await qr.release();
+    }
+  }
+
+  async updateItemArmor(items: ItemWearable[]): Promise<void> {
+    const qr = this.datasource.createQueryRunner();
+    await qr.connect();
+    await qr.startTransaction();
+    try {
+      await qr.manager.getRepository(ItemWearable).delete({ itemType: ItemType.Armor });
+      await qr.manager.getRepository(ItemWearable).insert(items);
+    } catch (e) {
       await qr.rollbackTransaction();
     } finally {
       await qr.release();

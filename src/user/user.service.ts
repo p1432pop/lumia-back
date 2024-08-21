@@ -10,6 +10,9 @@ import { GameDTO } from 'src/game/dto/game.dto';
 import { User } from './entity/user.entity';
 import { UserDTO } from './dto/response/user.dto';
 import { UserRank } from './dto/response/userRank.dto';
+import { QueryRunner } from 'typeorm';
+import _ from 'lodash';
+import { AxiosQueuePriority } from 'src/axios/axios.enum';
 
 @Injectable()
 export class UserService {
@@ -53,7 +56,7 @@ export class UserService {
     throw new BadRequestException('user must have at least 1 rank game');
   }
 
-  async post(updateUserDto: UpdateUserDTO): Promise<UserDTO | null> {
+  async updateUser(updateUserDto: UpdateUserDTO): Promise<UserDTO | null> {
     const { userNum } = updateUserDto;
     const user = await this.userRepository.getUserByUserNum(userNum);
 
@@ -62,8 +65,28 @@ export class UserService {
     }
 
     if (!user.updated) {
-      const userStats = await this.axiosService.getUserStatsByUserNum(userNum);
-      user.userStats = userStats;
+      let seasonIds: number[] = [];
+      let results: UserSeasonStat[] = [];
+      for (let i = 1; i < 25; i = i + 2) {
+        seasonIds.push(i);
+      }
+      const userStatResponses = await Promise.all(
+        seasonIds.map((seasonId: number) => this.axiosService.getUserStat(userNum, seasonId, { priority: AxiosQueuePriority.HIGH })),
+      );
+      userStatResponses.forEach((userStatResponse) => {
+        if (!userStatResponse || !userStatResponse.userStats) {
+          return;
+        }
+        userStatResponse.userStats.forEach((userStat) => {
+          const entity = new UserSeasonStat();
+          entity.userNum = userNum;
+          entity.seasonId = userStat.seasonId;
+          entity.matchingTeamMode = userStat.matchingTeamMode;
+          entity.mmr = userStat.mmr;
+          results.push(entity);
+        });
+      });
+      user.userStats = results;
     }
 
     user.updated = new Date();
@@ -71,29 +94,16 @@ export class UserService {
     return this.entityToDTO(updatedUser);
   }
 
-  async upsertUsers(users: User[]): Promise<void> {
-    await this.userRepository.upsertUsers(users);
+  async upsertUser(user: User | User[], qr?: QueryRunner): Promise<void> {
+    await this.userRepository.upsertUser(user, qr);
   }
 
   private entityToDTO(user: User): UserDTO {
     const userDTO: UserDTO = {
       ...user,
-      prevStats: this.groupBySeason(user.userStats),
+      prevStats: Object.values(_.groupBy(user.userStats, 'seasonId')),
     };
     return userDTO;
-  }
-
-  private groupBySeason(userStats: UserSeasonStat[]): UserSeasonStat[][] {
-    const grouped = Object.values(
-      userStats.reduce<Record<number, UserSeasonStat[]>>((acc, obj) => {
-        if (!acc[obj.seasonId]) {
-          acc[obj.seasonId] = [];
-        }
-        acc[obj.seasonId].push(obj);
-        return acc;
-      }, {}),
-    );
-    return grouped;
   }
 
   private next(games: GameDTO[]): number | undefined {

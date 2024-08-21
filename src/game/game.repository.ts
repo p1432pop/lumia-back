@@ -1,11 +1,13 @@
-import { Repository } from 'typeorm';
+import { QueryRunner, Repository } from 'typeorm';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Game } from './game.entity';
 import { UserGamesQueryDTO } from 'src/user/dto/request/userGamesQuery.dto';
+import _ from 'lodash';
 
 @Injectable()
 export class GameRepository {
+  private readonly CHUNK_SIZE: 500;
   constructor(
     @InjectRepository(Game)
     private readonly gameRepository: Repository<Game>,
@@ -57,7 +59,9 @@ export class GameRepository {
     else return 0;
   }
 
-  async insertGames(games: Game[]): Promise<void> {
-    await this.gameRepository.insert(games);
+  async insertGame(game: Game | Game[], qr?: QueryRunner): Promise<void> {
+    const repository = qr ? qr.manager.getRepository(Game) : this.gameRepository;
+    const chunks = Array.isArray(game) ? _.chunk(game, this.CHUNK_SIZE) : [[game]];
+    await Promise.all(chunks.map((chunk) => repository.insert(chunk)));
   }
 }
