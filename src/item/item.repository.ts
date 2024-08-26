@@ -62,6 +62,7 @@ export class ItemRepository {
     try {
       await qr.manager.getRepository(ItemConsumable).delete({});
       await qr.manager.getRepository(ItemConsumable).insert(items);
+      await qr.commitTransaction();
     } catch (e) {
       await qr.rollbackTransaction();
     } finally {
@@ -76,6 +77,7 @@ export class ItemRepository {
     try {
       await qr.manager.getRepository(ItemWearable).delete({ itemType: ItemType.Weapon });
       await qr.manager.getRepository(ItemWearable).insert(items);
+      await qr.commitTransaction();
     } catch (e) {
       await qr.rollbackTransaction();
     } finally {
@@ -90,6 +92,7 @@ export class ItemRepository {
     try {
       await qr.manager.getRepository(ItemWearable).delete({ itemType: ItemType.Armor });
       await qr.manager.getRepository(ItemWearable).insert(items);
+      await qr.commitTransaction();
     } catch (e) {
       await qr.rollbackTransaction();
     } finally {
